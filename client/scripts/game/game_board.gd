@@ -18,7 +18,7 @@ signal go_to_title
 @onready var card_preview: PanelContainer = $MainVBox/CenterArea/CardPreview
 @onready var preview_artist_bar: ColorRect = $MainVBox/CenterArea/CardPreview/Margin/VBox/PreviewArtistBar
 @onready var preview_artist_label: Label = $MainVBox/CenterArea/CardPreview/Margin/VBox/PreviewArtistLabel
-@onready var preview_art_area: ColorRect = $MainVBox/CenterArea/CardPreview/Margin/VBox/PreviewArtArea
+@onready var preview_art_area: TextureRect = $MainVBox/CenterArea/CardPreview/Margin/VBox/PreviewArtArea
 @onready var preview_auction_label: Label = $MainVBox/CenterArea/CardPreview/Margin/VBox/PreviewAuctionLabel
 @onready var market_board: PanelContainer = $MainVBox/MarketBoard
 @onready var hand_area: PanelContainer = $MainVBox/HandArea
@@ -217,7 +217,16 @@ func _show_card_preview(card_index: int) -> void:
 	var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
 
 	preview_artist_bar.color = color
-	preview_art_area.color = Color(color.r, color.g, color.b, 0.3)
+	var card_id: String = data.get("card_id", "")
+	var img_path := "res://assets/cards/%s.png" % card_id
+	if card_id != "" and ResourceLoader.exists(img_path):
+		preview_art_area.texture = load(img_path)
+		preview_art_area.self_modulate = Color.WHITE
+	else:
+		var img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+		img.fill(Color(color.r, color.g, color.b, 0.3))
+		preview_art_area.texture = ImageTexture.create_from_image(img)
+		preview_art_area.self_modulate = Color.WHITE
 	preview_artist_label.text = Locale.t(artist)
 	preview_artist_label.add_theme_color_override("font_color", color)
 	var icon: String = AUCTION_ICONS.get(atype, "?")

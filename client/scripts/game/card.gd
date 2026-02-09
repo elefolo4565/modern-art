@@ -6,7 +6,7 @@ signal card_pressed(card_index: int)
 
 @onready var artist_bar: ColorRect = $VBox/ArtistBar
 @onready var artist_label: Label = $VBox/ArtistLabel
-@onready var art_area: ColorRect = $VBox/ArtArea
+@onready var art_area: TextureRect = $VBox/ArtArea
 @onready var auction_label: Label = $VBox/AuctionLabel
 
 var card_data: Dictionary = {}
@@ -37,12 +37,25 @@ func _update_display() -> void:
 	var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
 
 	artist_bar.color = color
-	art_area.color = Color(color.r, color.g, color.b, 0.3)
+	_load_card_art(artist, card_data.get("card_id", ""))
 	artist_label.text = Locale.t(artist)
 	artist_label.add_theme_color_override("font_color", color)
 
 	var icon: String = AUCTION_ICONS.get(atype, "?")
 	auction_label.text = "%s %s" % [icon, Locale.t("auction_" + atype)]
+
+func _load_card_art(artist: String, card_id: String) -> void:
+	var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
+	var img_path := "res://assets/cards/%s.png" % card_id
+	if card_id != "" and ResourceLoader.exists(img_path):
+		art_area.texture = load(img_path)
+		art_area.self_modulate = Color.WHITE
+	else:
+		# Fallback: solid color block (same as before)
+		var img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+		img.fill(Color(color.r, color.g, color.b, 0.3))
+		art_area.texture = ImageTexture.create_from_image(img)
+		art_area.self_modulate = Color.WHITE
 
 func set_selected(selected: bool) -> void:
 	is_selected = selected

@@ -102,11 +102,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 
-[node name="PreviewArtArea" type="ColorRect" parent="MainVBox/CenterArea/CardPreview/Margin/VBox"]
+[node name="PreviewArtArea" type="TextureRect" parent="MainVBox/CenterArea/CardPreview/Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 custom_minimum_size = Vector2(0, 180)
-color = Color(0.5, 0.5, 0.5, 0.3)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="PreviewAuctionLabel" type="Label" parent="MainVBox/CenterArea/CardPreview/Margin/VBox"]
 layout_mode = 2
