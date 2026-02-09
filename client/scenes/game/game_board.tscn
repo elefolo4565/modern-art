@@ -1,0 +1,202 @@
+[gd_scene load_steps=6 format=3 uid="uid://game001"]
+
+[ext_resource type="Script" path="res://scripts/game/game_board.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://hand001" path="res://scenes/components/hand_area.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://market001" path="res://scenes/game/market_board.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://auction001" path="res://scenes/game/auction_panel.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://pinfo001" path="res://scenes/components/player_info.tscn" id="5"]
+
+[node name="GameBoard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.1, 0.14, 1)
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 5
+
+[node name="InfoBar" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 45)
+theme_override_constants/separation = 15
+
+[node name="RoundLabel" type="Label" parent="MainVBox/InfoBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Round 1/4"
+
+[node name="MoneyLabel" type="Label" parent="MainVBox/InfoBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+text = "100K"
+horizontal_alignment = 2
+
+[node name="TurnLabel" type="Label" parent="MainVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.9, 0.5, 1)
+
+[node name="PlayerListBox" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HSeparator" type="HSeparator" parent="MainVBox"]
+layout_mode = 2
+
+[node name="CenterArea" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 0
+
+[node name="AuctionPanel" parent="MainVBox/CenterArea" instance=ExtResource("4")]
+layout_mode = 2
+
+[node name="PlayCardButton" type="Button" parent="MainVBox/CenterArea"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+theme_override_font_sizes/font_size = 22
+text = "Play Card"
+disabled = true
+
+[node name="CardPreview" type="PanelContainer" parent="MainVBox/CenterArea"]
+layout_mode = 2
+visible = false
+size_flags_vertical = 3
+
+[node name="Margin" type="MarginContainer" parent="MainVBox/CenterArea/CardPreview"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="MainVBox/CenterArea/CardPreview/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PreviewArtistBar" type="ColorRect" parent="MainVBox/CenterArea/CardPreview/Margin/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 16)
+color = Color(1, 1, 1, 1)
+
+[node name="PreviewArtistLabel" type="Label" parent="MainVBox/CenterArea/CardPreview/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+
+[node name="PreviewArtArea" type="ColorRect" parent="MainVBox/CenterArea/CardPreview/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 180)
+color = Color(0.5, 0.5, 0.5, 0.3)
+
+[node name="PreviewAuctionLabel" type="Label" parent="MainVBox/CenterArea/CardPreview/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+
+[node name="DoublePanel" type="VBoxContainer" parent="MainVBox/CenterArea"]
+layout_mode = 2
+visible = false
+
+[node name="DoubleLabel" type="Label" parent="MainVBox/CenterArea/DoublePanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="DoubleButtons" type="HBoxContainer" parent="MainVBox/CenterArea/DoublePanel"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 15
+
+[node name="DoubleYesButton" type="Button" parent="MainVBox/CenterArea/DoublePanel/DoubleButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 50)
+theme_override_font_sizes/font_size = 18
+text = "Double"
+
+[node name="DoubleNoButton" type="Button" parent="MainVBox/CenterArea/DoublePanel/DoubleButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 50)
+theme_override_font_sizes/font_size = 18
+text = "Single"
+
+[node name="HSeparator2" type="HSeparator" parent="MainVBox"]
+layout_mode = 2
+
+[node name="RecentLog" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 2
+
+[node name="MarketBoard" parent="MainVBox" instance=ExtResource("3")]
+layout_mode = 2
+
+[node name="HSeparator3" type="HSeparator" parent="MainVBox"]
+layout_mode = 2
+
+[node name="HandArea" parent="MainVBox" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="LogOverlay" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LogMargin" type="MarginContainer" parent="LogOverlay"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="LogVBox" type="VBoxContainer" parent="LogOverlay/LogMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LogTitleBar" type="HBoxContainer" parent="LogOverlay/LogMargin/LogVBox"]
+layout_mode = 2
+
+[node name="LogTitleLabel" type="Label" parent="LogOverlay/LogMargin/LogVBox/LogTitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+
+[node name="LogCloseButton" type="Button" parent="LogOverlay/LogMargin/LogVBox/LogTitleBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_font_sizes/font_size = 18
+text = "x"
+
+[node name="LogScroll" type="ScrollContainer" parent="LogOverlay/LogMargin/LogVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="LogContent" type="VBoxContainer" parent="LogOverlay/LogMargin/LogVBox/LogScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+

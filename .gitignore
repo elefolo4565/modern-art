@@ -1,0 +1,18 @@
+# Godot
+client/.godot/
+
+# Export
+export/
+
+# Python
+server/__pycache__/
+*.pyc
+*.log
+
+# OS
+nul
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/
