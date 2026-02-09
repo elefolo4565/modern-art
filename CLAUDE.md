@@ -66,3 +66,7 @@ cd server && python main.py --port 8080
 - **アクティブプレイヤー枠**: PanelContainer+StyleBoxFlatで黄色い丸みを帯びた枠。Tweenで透明度パルスアニメーション（0.9秒周期, SINE）
 - **取引ログ**: 相場ボード左の「ログ」ボタン→全画面オーバーレイ表示。GameState.auction_logにオークション結果を蓄積。タイトルバー右の「x」で閉じる
 - **ダブルプレイUI表示**: サーバーからcard_playedに`is_double`フラグ送信。オークションパネルのタイプ表示に「[x2 ダブル]」追記。取引ログにもダブル表記。ターンラベルにダブルプレイ通知表示
+- **直近ログ表示**: 相場ボードの上にRecentLog（VBoxContainer）で直近3件のオークション結果を常時表示。font_size=12、アーティスト色付き
+
+## Git運用
+- 機能実装やバグ修正のたびにgitコミットを行う
