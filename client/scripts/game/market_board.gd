@@ -19,6 +19,7 @@ func _ready() -> void:
 	_build_board()
 	GameState.state_changed.connect(update_display)
 	GameState.hand_updated.connect(update_display)
+	GameState.auction_ended.connect(func(_data): update_display())
 	Locale.language_changed.connect(_rebuild)
 
 func _rebuild() -> void:

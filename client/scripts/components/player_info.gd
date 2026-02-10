@@ -3,6 +3,7 @@ extends PanelContainer
 @onready var name_label: Label = $VBox/NameLabel
 @onready var money_label: Label = $VBox/MoneyLabel
 @onready var hand_label: Label = $VBox/HandLabel
+@onready var paintings_box: HBoxContainer = $VBox/PaintingsBox
 
 var player_index: int = -1
 var _pulse_tween: Tween
@@ -61,6 +62,32 @@ func update_display() -> void:
 	else:
 		add_theme_stylebox_override("panel", _normal_style)
 		_stop_pulse()
+
+	# Paintings display
+	_update_paintings(p.get("paintings", {}))
+
+func _update_paintings(paintings: Dictionary) -> void:
+	for child in paintings_box.get_children():
+		child.queue_free()
+
+	for artist in GameState.ARTISTS:
+		var count: int = paintings.get(artist, 0)
+		if count <= 0:
+			continue
+		var lbl := Label.new()
+		lbl.text = "%s%d" % [_abbrev(artist), count]
+		lbl.add_theme_font_size_override("font_size", 10)
+		lbl.add_theme_color_override("font_color", GameState.ARTIST_COLORS.get(artist, Color.WHITE))
+		paintings_box.add_child(lbl)
+
+func _abbrev(artist: String) -> String:
+	match artist:
+		"Orange Tarou": return "O"
+		"Green Tarou": return "G"
+		"Blue Tarou": return "B"
+		"Yellow Tarou": return "Y"
+		"Red Tarou": return "R"
+	return artist.left(1)
 
 func _start_pulse() -> void:
 	_stop_pulse()

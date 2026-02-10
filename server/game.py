@@ -25,12 +25,18 @@ class Player:
     is_ai: bool = False
 
     def to_dict(self, hide_hand: bool = True) -> Dict:
+        paintings_by_artist: Dict[str, int] = {}
+        for p in self.paintings:
+            a = p.get("artist", "")
+            if a:
+                paintings_by_artist[a] = paintings_by_artist.get(a, 0) + 1
         d = {
             "id": self.player_id,
             "name": self.name,
             "money": self.money,
             "hand_count": len(self.hand),
             "paintings_count": len(self.paintings),
+            "paintings": paintings_by_artist,
             "is_ai": self.is_ai,
         }
         if not hide_hand:
