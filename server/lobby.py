@@ -96,10 +96,6 @@ class Lobby:
         self.player_room[player_id] = room_id
         self.ws_to_player[ws] = player_id
 
-        # Add 2 AI players by default before sending room_created
-        for _ in range(2):
-            self._add_ai_player(room)
-
         players_list = [p.to_public_dict() for p in room.players]
         await ws.send_str(msg_room_created(room_id, player_id, players_list))
 
