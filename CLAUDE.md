@@ -90,3 +90,6 @@ cd server && python main.py --port 8080
 ## Git運用
 - 機能実装やバグ修正のたびにgitコミットを行う
 - サーバー（server/）に変更があるコミット後は、即座にサーバーを再起動する（既存プロセスをkill→再起動）
+- サーバー再起動は PowerShell 経由で行うこと（Git Bash では `taskkill` のフラグが誤解釈される）
+  - 停止: `powershell -Command "Stop-Process -Id <PID> -Force"`
+  - 起動: `powershell -Command "Start-Process python -ArgumentList 'server\main.py','--port','8080' -WorkingDirectory 'server' -WindowStyle Hidden"`
