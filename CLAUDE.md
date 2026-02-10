@@ -12,9 +12,10 @@
 
 ## 技術スタック
 - **クライアント**: Godot 4.6 (GDScript), Web Export (HTML5/WASM)
-- **サーバー**: Python 3 + aiohttp (WebSocket + 静的ファイル配信)
+- **サーバー**: Python 3 + aiohttp (WebSocket)
 - **通信**: WebSocket (JSON)
 - **対応言語**: 日本語・英語（切替可能）
+- **ホスティング**: クライアント=GitHub Pages / サーバー=Render
 
 ## フォルダ構成
 ```
@@ -67,6 +68,19 @@ cd server && python main.py --port 8080
 - **取引ログ**: 相場ボード左の「ログ」ボタン→全画面オーバーレイ表示。GameState.auction_logにオークション結果を蓄積。タイトルバー右の「x」で閉じる
 - **ダブルプレイUI表示**: サーバーからcard_playedに`is_double`フラグ送信。オークションパネルのタイプ表示に「[x2 ダブル]」追記。取引ログにもダブル表記。ターンラベルにダブルプレイ通知表示
 - **直近ログ表示**: 相場ボードの上にRecentLog（VBoxContainer）で直近3件のオークション結果を常時表示。font_size=12、アーティスト色付き
+- **所持絵画表示**: player_infoにアーティスト色付きの絵画数を表示（O1 G2形式）。相場ボードの「絵画」ボタンで全画面オーバーレイの詳細一覧を表示
+- **ダブルカード手札フィルタ**: ダブル選択時、同じアーティストのカードのみ選択可能。hand_area.set_filter()/clear_filter()で制御
+
+## デプロイ構成
+- **クライアント**: GitHub Pages（`.github/workflows/deploy-pages.yml` で `export/` を自動デプロイ）
+- **サーバー**: Render（`server/render.yaml` で Python WebSocket サーバーをデプロイ）
+- **WebSocket接続**: `network.gd` の `server_url` に Render の URL をハードコード。ローカル開発時は自動的に `ws://127.0.0.1:8080/ws` に切替
+- **フォント**: NotoSansJP-Bold.ttf をデフォルトテーマに設定（Web Export で日本語表示に必須）
+
+## バージョン管理ルール
+- 機能追加・バグ修正・UIの変更など、何らかの更新を行った場合は `export/` を再エクスポートしてコミットに含めること
+- クライアント変更時: Godot で Web Export を再実行 → `export/` をコミット → プッシュで GitHub Pages が自動更新
+- サーバー変更時: コミット＆プッシュで Render が自動デプロイ。ローカルサーバーも再起動する
 
 ## Git運用
 - 機能実装やバグ修正のたびにgitコミットを行う
