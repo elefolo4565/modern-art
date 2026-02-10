@@ -82,6 +82,7 @@ cd server && python main.py --port 8080
 
 ## バージョン管理ルール
 - 機能追加・バグ修正・UIの変更など、何らかの更新を行った場合は CLAUDE.md のバージョン番号をインクリメントする（パッチ: +0.1）
+- クライアント変更を含む場合は `game_state.gd` の `BUILD_DATE` を日本時刻（JST）の `yyyymmdd_hhmmss` 形式で更新する
 - クライアント変更を含む場合は `export/` を再エクスポートしてコミットに含めること
 - クライアント変更時: Godot で Web Export を再実行 → `export/` をコミット → プッシュで GitHub Pages が自動更新
 - サーバー変更時: コミット＆プッシュで Render が自動デプロイ。ローカルサーバーも再起動する
