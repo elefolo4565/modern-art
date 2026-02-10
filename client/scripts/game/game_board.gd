@@ -28,6 +28,10 @@ signal go_to_title
 @onready var log_scroll: ScrollContainer = $LogOverlay/LogMargin/LogVBox/LogScroll
 @onready var log_content: VBoxContainer = $LogOverlay/LogMargin/LogVBox/LogScroll/LogContent
 @onready var log_close_button: Button = $LogOverlay/LogMargin/LogVBox/LogTitleBar/LogCloseButton
+@onready var paintings_overlay: PanelContainer = $PaintingsOverlay
+@onready var paintings_title_label: Label = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsTitleBar/PaintingsTitleLabel
+@onready var paintings_content: VBoxContainer = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsScroll/PaintingsContent
+@onready var paintings_close_button: Button = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsTitleBar/PaintingsCloseButton
 
 const PLAYER_INFO_SCENE := preload("res://scenes/components/player_info.tscn")
 const AUCTION_ICONS := {"open": ">>", "once_around": "->", "sealed": "[]", "fixed_price": "$=", "double": "x2"}
@@ -44,8 +48,11 @@ func _ready() -> void:
 	double_no_btn.pressed.connect(_on_double_no)
 	hand_area.card_selected.connect(_on_card_selected)
 	market_board.log_button_pressed.connect(_on_log_button_pressed)
+	market_board.paintings_button_pressed.connect(_on_paintings_button_pressed)
 	log_close_button.pressed.connect(_on_log_close_pressed)
+	paintings_close_button.pressed.connect(_on_paintings_close_pressed)
 	log_title_label.text = Locale.t("log_title")
+	paintings_title_label.text = Locale.t("paintings_title")
 
 	GameState.game_started.connect(_on_game_started)
 	GameState.turn_changed.connect(_update_turn)
@@ -273,6 +280,13 @@ func _on_log_button_pressed() -> void:
 func _on_log_close_pressed() -> void:
 	log_overlay.visible = false
 
+func _on_paintings_button_pressed() -> void:
+	_build_paintings_content()
+	paintings_overlay.visible = true
+
+func _on_paintings_close_pressed() -> void:
+	paintings_overlay.visible = false
+
 func _update_recent_log() -> void:
 	for child in recent_log.get_children():
 		child.queue_free()
@@ -341,3 +355,49 @@ func _build_log_content() -> void:
 		lbl.add_theme_color_override("font_color", color)
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		log_content.add_child(lbl)
+
+func _build_paintings_content() -> void:
+	for child in paintings_content.get_children():
+		child.queue_free()
+
+	paintings_title_label.text = Locale.t("paintings_title")
+
+	for i in range(GameState.players.size()):
+		var p: Dictionary = GameState.players[i]
+		var pname: String = p.get("name", "???")
+		var is_me := (i == GameState.my_index)
+		var paintings: Dictionary = p.get("paintings", {})
+
+		# Player name header
+		var name_lbl := Label.new()
+		name_lbl.text = pname + (" *" if is_me else "")
+		name_lbl.add_theme_font_size_override("font_size", 18)
+		if is_me:
+			name_lbl.add_theme_color_override("font_color", Color(0.5, 0.8, 1, 1))
+		paintings_content.add_child(name_lbl)
+
+		# Artist paintings list
+		var has_any := false
+		for artist in GameState.ARTISTS:
+			var count: int = paintings.get(artist, 0)
+			if count <= 0:
+				continue
+			has_any = true
+			var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
+			var row := Label.new()
+			row.text = "  %s x%d" % [Locale.t(artist), count]
+			row.add_theme_font_size_override("font_size", 14)
+			row.add_theme_color_override("font_color", color)
+			paintings_content.add_child(row)
+
+		if not has_any:
+			var none_lbl := Label.new()
+			none_lbl.text = "  -"
+			none_lbl.add_theme_font_size_override("font_size", 14)
+			none_lbl.modulate = Color(1, 1, 1, 0.4)
+			paintings_content.add_child(none_lbl)
+
+		# Separator between players (except last)
+		if i < GameState.players.size() - 1:
+			var sep := HSeparator.new()
+			paintings_content.add_child(sep)

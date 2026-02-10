@@ -3,10 +3,12 @@ extends PanelContainer
 ## Compact market board showing artist values and board counts.
 
 signal log_button_pressed
+signal paintings_button_pressed
 
 @onready var hbox: HBoxContainer = $HBox
 @onready var header_label: Label = $HBox/HeaderLabel
-@onready var log_button: Button = $HBox/LogButton
+@onready var log_button: Button = $HBox/ButtonsBox/LogButton
+@onready var paintings_button: Button = $HBox/ButtonsBox/PaintingsButton
 
 var _artist_labels: Dictionary = {}
 var _value_labels: Dictionary = {}
@@ -15,7 +17,9 @@ var _pending_labels: Dictionary = {}
 
 func _ready() -> void:
 	log_button.text = Locale.t("log_button")
+	paintings_button.text = Locale.t("paintings_button")
 	log_button.pressed.connect(func(): log_button_pressed.emit())
+	paintings_button.pressed.connect(func(): paintings_button_pressed.emit())
 	_build_board()
 	GameState.state_changed.connect(update_display)
 	GameState.hand_updated.connect(update_display)
@@ -24,12 +28,14 @@ func _ready() -> void:
 
 func _rebuild() -> void:
 	log_button.text = Locale.t("log_button")
+	paintings_button.text = Locale.t("paintings_button")
 	_build_board()
 
 func _build_board() -> void:
-	# Remove old dynamic children (keep LogButton and HeaderLabel)
+	# Remove old dynamic children (keep ButtonsBox and HeaderLabel)
+	var buttons_box = $HBox/ButtonsBox
 	for child in hbox.get_children():
-		if child != header_label and child != log_button:
+		if child != header_label and child != buttons_box:
 			child.queue_free()
 
 	_artist_labels.clear()

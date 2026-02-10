@@ -102,9 +102,11 @@ func _load_translations() -> void:
 		"ai_normal": {"ja": "ふつう", "en": "Normal"},
 		"ai_hard": {"ja": "むずかしい", "en": "Hard"},
 
-		# Log
+		# Log & Paintings
 		"log_button": {"ja": "ログ", "en": "Log"},
 		"log_title": {"ja": "取引ログ", "en": "Auction Log"},
+		"paintings_button": {"ja": "絵画", "en": "Art"},
+		"paintings_title": {"ja": "所持絵画一覧", "en": "Owned Paintings"},
 		"log_empty": {"ja": "取引記録はまだありません", "en": "No transactions yet"},
 		"double_play": {"ja": "x2 ダブル", "en": "x2 Double"},
 

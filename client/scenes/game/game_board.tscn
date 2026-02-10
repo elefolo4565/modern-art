@@ -201,3 +201,47 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
+[node name="PaintingsOverlay" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PaintingsMargin" type="MarginContainer" parent="PaintingsOverlay"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="PaintingsVBox" type="VBoxContainer" parent="PaintingsOverlay/PaintingsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PaintingsTitleBar" type="HBoxContainer" parent="PaintingsOverlay/PaintingsMargin/PaintingsVBox"]
+layout_mode = 2
+
+[node name="PaintingsTitleLabel" type="Label" parent="PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsTitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+
+[node name="PaintingsCloseButton" type="Button" parent="PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsTitleBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_font_sizes/font_size = 18
+text = "x"
+
+[node name="PaintingsScroll" type="ScrollContainer" parent="PaintingsOverlay/PaintingsMargin/PaintingsVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PaintingsContent" type="VBoxContainer" parent="PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
