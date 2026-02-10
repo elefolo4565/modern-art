@@ -2,7 +2,7 @@ extends Node
 
 ## Client-side game state, updated by server messages.
 
-const VERSION: String = "0.1.3"
+const VERSION: String = "0.14"
 
 signal state_changed
 signal hand_updated
