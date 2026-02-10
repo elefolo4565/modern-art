@@ -117,7 +117,9 @@ def create_app(static_dir: str = None) -> web.Application:
 def main():
     parser = argparse.ArgumentParser(description="Modern Art Game Server")
     parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
-    parser.add_argument("--port", type=int, default=8080, help="Port to listen on")
+    parser.add_argument("--port", type=int,
+                        default=int(os.environ.get("PORT", "8080")),
+                        help="Port to listen on")
     parser.add_argument("--static", default=None,
                         help="Path to static files (Godot web export directory)")
     args = parser.parse_args()

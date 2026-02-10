@@ -1,8 +1,8 @@
 # Godot
 client/.godot/
 
-# Export
-export/
+# Export (committed for Render deployment)
+# export/
 
 # Python
 server/__pycache__/
