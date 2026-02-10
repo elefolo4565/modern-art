@@ -98,6 +98,12 @@ class Lobby:
 
         await ws.send_str(msg_room_created(room_id, player_id))
 
+        # Add 2 AI players by default
+        for _ in range(2):
+            self._add_ai_player(room)
+        players_list = [p.to_public_dict() for p in room.players]
+        await self._send_safe(ws, msg_player_joined(players_list, ""))
+
     async def _handle_join_room(self, ws, data: dict) -> None:
         player_name = data.get("player_name", "").strip()
         room_id = data.get("room_id", "").strip().upper()
@@ -136,6 +142,23 @@ class Lobby:
                     players_list, player_name
                 ))
 
+    def _add_ai_player(self, room: Room) -> str:
+        """Add an AI player to the room and return its name."""
+        if not room.ai_controller:
+            room.ai_controller = AIPlayerController()
+
+        ai_name = room.ai_controller.get_ai_name()
+        ai_id = "ai_" + self._generate_player_id()
+
+        ai_player = Player(
+            player_id=ai_id,
+            name=ai_name,
+            ws=None,
+            is_ai=True,
+        )
+        room.players.append(ai_player)
+        return ai_name
+
     async def _handle_add_ai(self, ws, data: dict) -> None:
         """Add an AI player to the room."""
         player_id = self.ws_to_player.get(ws)
@@ -160,20 +183,7 @@ class Lobby:
             await ws.send_str(msg_error("Room is full (max 5 players)"))
             return
 
-        difficulty = data.get("difficulty", "normal")
-        if not room.ai_controller:
-            room.ai_controller = AIPlayerController(difficulty)
-
-        ai_name = room.ai_controller.get_ai_name()
-        ai_id = "ai_" + self._generate_player_id()
-
-        ai_player = Player(
-            player_id=ai_id,
-            name=ai_name,
-            ws=None,
-            is_ai=True,
-        )
-        room.players.append(ai_player)
+        ai_name = self._add_ai_player(room)
 
         players_list = [p.to_public_dict() for p in room.players]
 
