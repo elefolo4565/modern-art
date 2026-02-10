@@ -228,13 +228,15 @@ func _handle_round_ended(data: Dictionary) -> void:
 		players = data["players"]
 	if data.has("new_hand"):
 		hand = data["new_hand"]
-		hand_updated.emit()
 	# Reset board for next round
 	for artist in ARTISTS:
 		board[artist] = 0
 		settled_board[artist] = 0
 	my_paintings = []
+	# Emit round_ended before hand_updated so listeners can request deal animation
 	round_ended.emit(data)
+	if data.has("new_hand"):
+		hand_updated.emit()
 
 func _handle_game_ended(data: Dictionary) -> void:
 	if data.has("players"):

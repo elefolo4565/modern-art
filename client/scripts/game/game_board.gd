@@ -68,7 +68,7 @@ func _on_game_started(_data: Dictionary) -> void:
 	_build_player_list()
 	_refresh_all()
 	_update_recent_log()
-	hand_area.refresh_hand()
+	hand_area.request_deal_animation()
 
 func _build_player_list() -> void:
 	# Clear
@@ -207,7 +207,7 @@ func _on_round_ended(_data: Dictionary) -> void:
 	market_board.update_display()
 	_update_player_infos()
 	_update_recent_log()
-	# hand_area.refresh_hand() は hand_updated シグナル経由で既に呼ばれる
+	hand_area.request_deal_animation()
 
 func _on_game_ended(_data: Dictionary) -> void:
 	# Transition to result screen after a delay

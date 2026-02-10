@@ -12,15 +12,22 @@ const CARD_H := 170.0
 
 var selected_index: int = -1
 var _filter_artist: String = ""
+var _pending_animate: bool = false
 
 func _ready() -> void:
 	GameState.hand_updated.connect(refresh_hand)
 	card_container.resized.connect(_layout_cards)
 
+func request_deal_animation() -> void:
+	_pending_animate = true
+
 func refresh_hand() -> void:
 	for child in card_container.get_children():
 		child.queue_free()
 	selected_index = -1
+
+	var should_animate := _pending_animate
+	_pending_animate = false
 
 	var atype_order := {"open": 0, "once_around": 1, "sealed": 2, "fixed_price": 3, "double": 4}
 
@@ -44,6 +51,9 @@ func refresh_hand() -> void:
 
 	await get_tree().process_frame
 	_layout_cards()
+
+	if should_animate:
+		_animate_deal()
 
 func _layout_cards() -> void:
 	var cards: Array[Node] = []
@@ -125,3 +135,18 @@ func clear_filter() -> void:
 	for child in card_container.get_children():
 		if child.has_method("set_disabled"):
 			child.set_disabled(false)
+
+func _animate_deal() -> void:
+	var cards: Array[Node] = []
+	for c in card_container.get_children():
+		if not c.is_queued_for_deletion():
+			cards.append(c)
+	for i in range(cards.size()):
+		var card: Control = cards[i]
+		var final_y := card.position.y
+		card.position.y = final_y + 180.0
+		card.modulate = Color(1, 1, 1, 0)
+		var delay := i * 0.05
+		var tween := create_tween().set_parallel(true)
+		tween.tween_property(card, "position:y", final_y, 0.3).set_delay(delay).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+		tween.tween_property(card, "modulate:a", 1.0, 0.2).set_delay(delay)
