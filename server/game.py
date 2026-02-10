@@ -307,19 +307,47 @@ class Game:
             second_card = player.hand[second_card_index]
             if second_card.artist == base_card.artist:
                 player.hand.pop(second_card_index)
-                self.board[base_card.artist] += 1
-                if self._check_round_end(base_card.artist):
-                    await self._end_round()
-                    return
-
-                self.board[base_card.artist] += 1
-                if self._check_round_end(base_card.artist):
-                    await self._end_round()
-                    return
-
                 effective_type = second_card.auction_type
                 if effective_type == "double":
                     effective_type = "open"
+
+                log.info("[DOUBLE] %s plays %s x2 (%s), board[%s]=%d->%d",
+                         self._pname(player_index), base_card.artist,
+                         effective_type, base_card.artist,
+                         self.board[base_card.artist],
+                         self.board[base_card.artist] + 2)
+
+                self.board[base_card.artist] += 1
+                if self._check_round_end(base_card.artist):
+                    log.info("[DOUBLE ROUND END] %s board[%s]=%d (1st card)",
+                             self._pname(player_index), base_card.artist,
+                             self.board[base_card.artist])
+                    await self._broadcast(msg_card_played(
+                        artist=base_card.artist,
+                        board_count=self.board[base_card.artist],
+                        player_index=player_index,
+                        player_name=player.name,
+                        auction_type=effective_type,
+                        is_double=True,
+                    ))
+                    await self._end_round()
+                    return
+
+                self.board[base_card.artist] += 1
+                if self._check_round_end(base_card.artist):
+                    log.info("[DOUBLE ROUND END] %s board[%s]=%d (2nd card)",
+                             self._pname(player_index), base_card.artist,
+                             self.board[base_card.artist])
+                    await self._broadcast(msg_card_played(
+                        artist=base_card.artist,
+                        board_count=self.board[base_card.artist],
+                        player_index=player_index,
+                        player_name=player.name,
+                        auction_type=effective_type,
+                        is_double=True,
+                    ))
+                    await self._end_round()
+                    return
 
                 await self._broadcast(msg_card_played(
                     artist=base_card.artist,
@@ -341,8 +369,21 @@ class Game:
                 return
 
         # No second card - play base card as open auction
+        log.info("[DOUBLE DECLINE] %s plays %s as open, board[%s]=%d->%d",
+                 self._pname(player_index), base_card.artist,
+                 base_card.artist, self.board[base_card.artist],
+                 self.board[base_card.artist] + 1)
         self.board[base_card.artist] += 1
         if self._check_round_end(base_card.artist):
+            log.info("[DOUBLE DECLINE ROUND END] board[%s]=%d",
+                     base_card.artist, self.board[base_card.artist])
+            await self._broadcast(msg_card_played(
+                artist=base_card.artist,
+                board_count=self.board[base_card.artist],
+                player_index=player_index,
+                player_name=player.name,
+                auction_type="open",
+            ))
             await self._end_round()
             return
 
@@ -396,35 +437,46 @@ class Game:
         for idx in indices:
             player.hand.pop(idx)
 
-        self.board[card1.artist] += 1
-        if self._check_round_end(card1.artist):
-            await self._broadcast(msg_card_played(
-                artist=card1.artist,
-                board_count=self.board[card1.artist],
-                player_index=player_index,
-                player_name=player.name,
-                auction_type="double",
-                is_double=True,
-            ))
-            await self._end_round()
-            return
-
-        self.board[card1.artist] += 1
-        if self._check_round_end(card1.artist):
-            await self._broadcast(msg_card_played(
-                artist=card1.artist,
-                board_count=self.board[card1.artist],
-                player_index=player_index,
-                player_name=player.name,
-                auction_type="double",
-                is_double=True,
-            ))
-            await self._end_round()
-            return
-
         effective_type = card2.auction_type
         if effective_type == "double":
             effective_type = "open"
+
+        log.info("[DOUBLE] %s plays %s x2 (%s), board[%s]=%d->%d",
+                 self._pname(player_index), card1.artist, effective_type,
+                 card1.artist, self.board[card1.artist],
+                 self.board[card1.artist] + 2)
+
+        self.board[card1.artist] += 1
+        if self._check_round_end(card1.artist):
+            log.info("[DOUBLE ROUND END] %s board[%s]=%d (1st card)",
+                     self._pname(player_index), card1.artist,
+                     self.board[card1.artist])
+            await self._broadcast(msg_card_played(
+                artist=card1.artist,
+                board_count=self.board[card1.artist],
+                player_index=player_index,
+                player_name=player.name,
+                auction_type="double",
+                is_double=True,
+            ))
+            await self._end_round()
+            return
+
+        self.board[card1.artist] += 1
+        if self._check_round_end(card1.artist):
+            log.info("[DOUBLE ROUND END] %s board[%s]=%d (2nd card)",
+                     self._pname(player_index), card1.artist,
+                     self.board[card1.artist])
+            await self._broadcast(msg_card_played(
+                artist=card1.artist,
+                board_count=self.board[card1.artist],
+                player_index=player_index,
+                player_name=player.name,
+                auction_type="double",
+                is_double=True,
+            ))
+            await self._end_round()
+            return
 
         await self._broadcast(msg_card_played(
             artist=card1.artist,
