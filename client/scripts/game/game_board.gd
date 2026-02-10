@@ -134,6 +134,9 @@ func _on_card_selected(card_index: int) -> void:
 	_selected_card_index = card_index
 	_update_play_button()
 	_show_card_preview(card_index)
+	# ダブル選択中ならYesボタンを有効化
+	if double_panel.visible:
+		double_yes_btn.disabled = (_selected_card_index < 0)
 
 func _on_play_card_pressed() -> void:
 	if _selected_card_index < 0:
@@ -163,10 +166,11 @@ func _on_double_requested(data: Dictionary) -> void:
 	play_card_button.visible = false
 	double_label.text = "%s - %s" % [Locale.t("auction_select_double"), Locale.t(artist)]
 
-	# Player needs to select a second card from hand
-	# The hand_area will be used for selection
+	# Player needs to select a second card from hand first
 	_double_second_index = -1
+	_selected_card_index = -1
 	hand_area.clear_selection()
+	double_yes_btn.disabled = true
 
 func _on_double_yes() -> void:
 	# Use selected card as second card
