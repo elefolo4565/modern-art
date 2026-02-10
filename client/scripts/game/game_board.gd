@@ -217,7 +217,7 @@ func _show_card_preview(card_index: int) -> void:
 	var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
 
 	preview_artist_bar.color = color
-	var card_id: String = data.get("card_id", "")
+	var card_id: String = str(data.get("card_id", ""))
 	var img_path := "res://assets/cards/%s.png" % card_id
 	if card_id != "" and ResourceLoader.exists(img_path):
 		preview_art_area.texture = load(img_path)

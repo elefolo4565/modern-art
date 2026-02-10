@@ -37,7 +37,7 @@ func _update_display() -> void:
 	var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
 
 	artist_bar.color = color
-	_load_card_art(artist, card_data.get("card_id", ""))
+	_load_card_art(artist, str(card_data.get("card_id", "")))
 	artist_label.text = Locale.t(artist)
 	artist_label.add_theme_color_override("font_color", color)
 
