@@ -24,8 +24,11 @@ def parse_message(text: str) -> Dict[str, Any]:
 def msg_error(message: str) -> str:
     return make_message("error", message=message)
 
-def msg_room_created(room_id: str, player_id: str) -> str:
-    return make_message("room_created", room_id=room_id, player_id=player_id)
+def msg_room_created(room_id: str, player_id: str, players: list = None) -> str:
+    data = dict(room_id=room_id, player_id=player_id)
+    if players:
+        data["players"] = players
+    return make_message("room_created", **data)
 
 def msg_room_joined(room_id: str, player_id: str, players: list) -> str:
     return make_message("room_joined", room_id=room_id, player_id=player_id, players=players)

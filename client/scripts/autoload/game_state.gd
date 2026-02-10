@@ -95,6 +95,8 @@ func _on_message_received(data: Dictionary) -> void:
 			room_id = data.get("room_id", "")
 			player_id = data.get("player_id", "")
 			is_host = true
+			if data.has("players"):
+				players = data["players"]
 			room_created.emit(data)
 		"room_joined":
 			room_id = data.get("room_id", "")
