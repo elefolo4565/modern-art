@@ -71,6 +71,8 @@ func update_display() -> void:
 			continue
 		var market_val: int = GameState.market.get(artist, 0)
 		var board_count: int = GameState.board.get(artist, 0)
+		var settled_count: int = GameState.settled_board.get(artist, 0)
+		var pending_count: int = board_count - settled_count
 
 		var text := ""
 		if market_val > 0:
@@ -78,8 +80,12 @@ func update_display() -> void:
 		else:
 			text = "--"
 
-		if board_count > 0:
-			text += " [%d]" % board_count
+		if settled_count > 0 and pending_count > 0:
+			text += " [%d+%d]" % [settled_count, pending_count]
+		elif settled_count > 0:
+			text += " [%d]" % settled_count
+		elif pending_count > 0:
+			text += " [+%d]" % pending_count
 
 		_count_labels[artist].text = text
 

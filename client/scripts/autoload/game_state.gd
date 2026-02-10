@@ -48,7 +48,8 @@ var auction_can_act: bool = false
 var auction_bids_info: Array = []
 
 # Board state
-var board: Dictionary = {}  # {artist_name: count} cards played this round
+var board: Dictionary = {}  # {artist_name: count} cards played this round (includes pending auction)
+var settled_board: Dictionary = {}  # {artist_name: count} cards whose auction has completed
 var market: Dictionary = {}  # {artist_name: cumulative_value}
 var my_paintings: Array = []  # paintings I've acquired this round
 var auction_log: Array = []   # [{seller_name, winner_name, artist, auction_type, price, round}]
@@ -79,10 +80,12 @@ func reset_state() -> void:
 	is_my_turn = false
 	auction_active = false
 	board = {}
+	settled_board = {}
 	market = {}
 	my_paintings = []
 	for artist in ARTISTS:
 		board[artist] = 0
+		settled_board[artist] = 0
 		market[artist] = 0
 
 func _on_message_received(data: Dictionary) -> void:
@@ -208,6 +211,11 @@ func _handle_auction_result(data: Dictionary) -> void:
 		"is_double": _auction_is_double,
 	})
 
+	# Settle board: pending cards for this artist are now confirmed
+	var settled_artist: String = card.get("artist", "")
+	if settled_artist != "":
+		settled_board[settled_artist] = board.get(settled_artist, 0)
+
 	auction_ended.emit(data)
 
 func _handle_round_ended(data: Dictionary) -> void:
@@ -222,6 +230,7 @@ func _handle_round_ended(data: Dictionary) -> void:
 	# Reset board for next round
 	for artist in ARTISTS:
 		board[artist] = 0
+		settled_board[artist] = 0
 	my_paintings = []
 	round_ended.emit(data)
 
