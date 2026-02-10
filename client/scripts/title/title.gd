@@ -17,7 +17,7 @@ func _ready() -> void:
 	Locale.language_changed.connect(_update_texts)
 	_update_texts()
 
-	version_label.text = "v" + GameState.VERSION
+	version_label.text = "v" + GameState.VERSION + " (" + GameState.BUILD_DATE + ")"
 
 	# Start connecting to server
 	connection_label.text = Locale.t("connecting")
