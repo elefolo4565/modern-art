@@ -3,10 +3,14 @@ extends PanelContainer
 ## Auction panel handling all 5 auction types with appropriate UI controls.
 
 @onready var auction_title: Label = $MarginContainer/VBox/AuctionTitle
-@onready var auction_card_bar: ColorRect = $MarginContainer/VBox/AuctionCardBar
-@onready var auction_art_area: ColorRect = $MarginContainer/VBox/AuctionArtArea
-@onready var artist_label: Label = $MarginContainer/VBox/CardInfoRow/ArtistLabel
-@onready var auction_type_label: Label = $MarginContainer/VBox/CardInfoRow/AuctionTypeLabel
+@onready var auction_card_bar: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card1Col/AuctionCardBar
+@onready var auction_art_area: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card1Col/AuctionArtArea
+@onready var artist_label: Label = $MarginContainer/VBox/CardDisplayRow/Card1Col/ArtistLabel
+@onready var card2_col: VBoxContainer = $MarginContainer/VBox/CardDisplayRow/Card2Col
+@onready var double_card_bar: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card2Col/DoubleCardBar
+@onready var double_art_area: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card2Col/DoubleArtArea
+@onready var double_artist_label: Label = $MarginContainer/VBox/CardDisplayRow/Card2Col/DoubleArtistLabel
+@onready var auction_type_label: Label = $MarginContainer/VBox/AuctionTypeLabel
 @onready var seller_label: Label = $MarginContainer/VBox/SellerLabel
 @onready var bid_info_label: Label = $MarginContainer/VBox/BidInfoLabel
 @onready var bid_input: SpinBox = $MarginContainer/VBox/BidInputRow/BidInput
@@ -60,8 +64,22 @@ func _on_auction_started(data: Dictionary) -> void:
 	auction_art_area.color = Color(color.r, color.g, color.b, 0.3)
 	artist_label.text = Locale.t(artist)
 	artist_label.add_theme_color_override("font_color", color)
+
+	# Double card display
+	var double_card: Dictionary = data.get("double_card", {})
+	if not double_card.is_empty():
+		card2_col.visible = true
+		var artist2: String = double_card.get("artist", "")
+		var color2: Color = GameState.ARTIST_COLORS.get(artist2, Color.WHITE)
+		double_card_bar.color = color2
+		double_art_area.color = Color(color2.r, color2.g, color2.b, 0.3)
+		double_artist_label.text = Locale.t(artist2)
+		double_artist_label.add_theme_color_override("font_color", color2)
+	else:
+		card2_col.visible = false
+
 	var type_text := Locale.t("auction_" + _current_type)
-	if data.has("double_card"):
+	if not double_card.is_empty():
 		type_text = "%s [%s]" % [type_text, Locale.t("double_play")]
 	auction_type_label.text = type_text
 
