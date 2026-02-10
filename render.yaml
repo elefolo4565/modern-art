@@ -1,6 +1,0 @@
-services:
-  - type: web
-    runtime: python
-    name: modern-art
-    buildCommand: pip install -r server/requirements.txt
-    startCommand: cd server && python main.py

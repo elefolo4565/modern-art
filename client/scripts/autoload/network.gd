@@ -7,7 +7,9 @@ signal disconnected
 signal message_received(data: Dictionary)
 signal connection_error(reason: String)
 
-@export var server_url: String = "ws://127.0.0.1:8080/ws"
+# 本番: Render のサーバーURL（デプロイ後に更新する）
+# ローカル開発: ws://127.0.0.1:8080/ws
+@export var server_url: String = "wss://modern-art-server.onrender.com/ws"
 
 var _socket: WebSocketPeer = WebSocketPeer.new()
 var _connected: bool = false
@@ -16,18 +18,9 @@ var _reconnect_delay: float = 1.0
 var _should_reconnect: bool = false
 
 func _ready() -> void:
-	# Auto-detect server URL from browser location in web builds
-	if OS.has_feature("web"):
-		var js_code := """
-		(function() {
-			var loc = window.location;
-			var protocol = loc.protocol === 'https:' ? 'wss:' : 'ws:';
-			return protocol + '//' + loc.host + '/ws';
-		})()
-		"""
-		var result = JavaScriptBridge.eval(js_code)
-		if result:
-			server_url = str(result)
+	# ローカル開発時はlocalhostに接続
+	if not OS.has_feature("web"):
+		server_url = "ws://127.0.0.1:8080/ws"
 
 func connect_to_server(url: String = "") -> void:
 	if url != "":
