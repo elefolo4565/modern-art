@@ -627,7 +627,7 @@ class Game:
             players=[p.to_public_dict() for p in self.players],
         ))
 
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(2.0)
         await self._advance_turn()
 
     async def _advance_turn(self) -> None:
