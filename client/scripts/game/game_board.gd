@@ -170,9 +170,11 @@ func _on_double_requested(data: Dictionary) -> void:
 	_double_second_index = -1
 	_selected_card_index = -1
 	hand_area.clear_selection()
+	hand_area.set_filter(artist)
 	double_yes_btn.disabled = true
 
 func _on_double_yes() -> void:
+	hand_area.clear_filter()
 	# Use selected card as second card
 	if _selected_card_index >= 0:
 		var idx := _selected_card_index
@@ -185,6 +187,7 @@ func _on_double_yes() -> void:
 	double_panel.visible = false
 
 func _on_double_no() -> void:
+	hand_area.clear_filter()
 	# Decline double
 	Network.send_message({"type": "double_response", "card_index": -1})
 	double_panel.visible = false

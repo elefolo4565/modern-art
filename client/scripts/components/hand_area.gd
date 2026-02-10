@@ -11,6 +11,7 @@ const CARD_H := 170.0
 @onready var card_container: Control = $CardContainer
 
 var selected_index: int = -1
+var _filter_artist: String = ""
 
 func _ready() -> void:
 	GameState.hand_updated.connect(refresh_hand)
@@ -82,6 +83,13 @@ func _layout_cards() -> void:
 		card.z_index = 100 if card.is_selected else i
 
 func _on_card_pressed(card_index: int) -> void:
+	# フィルタ中は対象外カードの選択を無視
+	if _filter_artist != "":
+		if card_index >= 0 and card_index < GameState.hand.size():
+			var artist: String = GameState.hand[card_index].get("artist", "")
+			if artist != _filter_artist:
+				return
+
 	if selected_index == card_index:
 		selected_index = -1
 	else:
@@ -103,3 +111,17 @@ func clear_selection() -> void:
 		if child.has_method("set_selected"):
 			child.set_selected(false)
 	_layout_cards()
+
+func set_filter(artist: String) -> void:
+	_filter_artist = artist
+	clear_selection()
+	for child in card_container.get_children():
+		if child.has_method("set_disabled"):
+			var card_artist: String = child.card_data.get("artist", "")
+			child.set_disabled(card_artist != artist)
+
+func clear_filter() -> void:
+	_filter_artist = ""
+	for child in card_container.get_children():
+		if child.has_method("set_disabled"):
+			child.set_disabled(false)

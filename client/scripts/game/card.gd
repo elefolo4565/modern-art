@@ -12,6 +12,7 @@ signal card_pressed(card_index: int)
 var card_data: Dictionary = {}
 var card_index: int = -1
 var is_selected: bool = false
+var is_disabled: bool = false
 
 # Auction type icons
 const AUCTION_ICONS := {
@@ -59,12 +60,23 @@ func _load_card_art(artist: String, card_id: String) -> void:
 
 func set_selected(selected: bool) -> void:
 	is_selected = selected
-	if is_selected:
+	_update_modulate()
+
+func set_disabled(disabled: bool) -> void:
+	is_disabled = disabled
+	_update_modulate()
+
+func _update_modulate() -> void:
+	if is_disabled:
+		modulate = Color(0.4, 0.4, 0.4, 0.6)
+	elif is_selected:
 		modulate = Color(1.2, 1.2, 1.4, 1)
 	else:
 		modulate = Color.WHITE
 
 func _on_gui_input(event: InputEvent) -> void:
+	if is_disabled:
+		return
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			card_pressed.emit(card_index)

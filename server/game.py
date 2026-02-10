@@ -332,6 +332,13 @@ class Game:
                 await self._start_auction(player_index, base_card,
                                            effective_type, second_card)
                 return
+            else:
+                # Different artist - reject and keep waiting
+                self.waiting_for_double = True
+                self.double_base_card = base_card
+                self.double_player_index = player_index
+                await self._send_error(player, "Same artist card required")
+                return
 
         # No second card - play base card as open auction
         self.board[base_card.artist] += 1
