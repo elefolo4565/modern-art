@@ -6,7 +6,7 @@ signal log_button_pressed
 signal paintings_button_pressed
 
 @onready var hbox: HBoxContainer = $HBox
-@onready var header_label: Label = $HBox/HeaderLabel
+@onready var guide_col: VBoxContainer = $HBox/GuideCol
 @onready var log_button: Button = $HBox/ButtonsBox/LogButton
 @onready var paintings_button: Button = $HBox/ButtonsBox/PaintingsButton
 
@@ -32,10 +32,10 @@ func _rebuild() -> void:
 	_build_board()
 
 func _build_board() -> void:
-	# Remove old dynamic children (keep ButtonsBox and HeaderLabel)
+	# Remove old dynamic children (keep ButtonsBox and GuideCol)
 	var buttons_box = $HBox/ButtonsBox
 	for child in hbox.get_children():
-		if child != header_label and child != buttons_box:
+		if child != guide_col and child != buttons_box:
 			child.queue_free()
 
 	_artist_labels.clear()
@@ -43,7 +43,18 @@ func _build_board() -> void:
 	_settled_labels.clear()
 	_pending_labels.clear()
 
-	header_label.text = Locale.t("game_market")
+	# Build guide column labels
+	for child in guide_col.get_children():
+		child.queue_free()
+	var guide_color := Color(0.45, 0.43, 0.4, 1)
+	var guide_rows := ["", "market_value", "market_count", "market_bid"]
+	for key in guide_rows:
+		var lbl := Label.new()
+		lbl.text = Locale.t(key) if key != "" else ""
+		lbl.add_theme_font_size_override("font_size", 9)
+		lbl.add_theme_color_override("font_color", guide_color)
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		guide_col.add_child(lbl)
 
 	# Add separator
 	var sep := VSeparator.new()

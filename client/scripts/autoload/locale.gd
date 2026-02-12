@@ -69,6 +69,9 @@ func _load_translations() -> void:
 		"game_play_card": {"ja": "カードを出す", "en": "Play Card"},
 		"game_market": {"ja": "相場", "en": "Market"},
 		"game_paintings": {"ja": "絵画", "en": "Paintings"},
+		"market_value": {"ja": "価値", "en": "Val"},
+		"market_count": {"ja": "枚数", "en": "Cnt"},
+		"market_bid": {"ja": "出品", "en": "Bid"},
 
 		# Auction
 		"auction_title": {"ja": "オークション", "en": "Auction"},
