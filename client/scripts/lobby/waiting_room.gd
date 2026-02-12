@@ -68,10 +68,10 @@ func _update_player_list() -> void:
 		if is_ai:
 			ai_count += 1
 			lbl.text = "%d. %s (AI)" % [i + 1, pname]
-			lbl.add_theme_color_override("font_color", Color(0.6, 0.85, 1, 1))
+			lbl.add_theme_color_override("font_color", Color(0.3, 0.55, 0.8, 1))
 		elif i == 0:
 			lbl.text = "%d. %s (Host)" % [i + 1, pname]
-			lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.3, 1))
+			lbl.add_theme_color_override("font_color", Color(0.8, 0.6, 0.1, 1))
 		else:
 			lbl.text = "%d. %s" % [i + 1, pname]
 

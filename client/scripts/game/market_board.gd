@@ -79,7 +79,7 @@ func _build_board() -> void:
 		settled_lbl.text = ""
 		settled_lbl.add_theme_font_size_override("font_size", 11)
 		settled_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		settled_lbl.add_theme_color_override("font_color", Color(0.7, 0.9, 0.7))
+		settled_lbl.add_theme_color_override("font_color", Color(0.2, 0.6, 0.3))
 		col.add_child(settled_lbl)
 		_settled_labels[artist] = settled_lbl
 
@@ -88,7 +88,7 @@ func _build_board() -> void:
 		pending_lbl.text = ""
 		pending_lbl.add_theme_font_size_override("font_size", 11)
 		pending_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		pending_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+		pending_lbl.add_theme_color_override("font_color", Color(0.8, 0.6, 0.1))
 		col.add_child(pending_lbl)
 		_pending_labels[artist] = pending_lbl
 

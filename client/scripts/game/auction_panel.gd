@@ -107,7 +107,7 @@ func _update_controls(can_act: bool) -> void:
 	# Prominent turn indicator
 	if can_act:
 		auction_title.text = Locale.t("auction_your_turn")
-		auction_title.add_theme_color_override("font_color", Color(1, 0.85, 0.1))
+		auction_title.add_theme_color_override("font_color", Color(0.8, 0.6, 0.1))
 	else:
 		auction_title.text = Locale.t("auction_title")
 		auction_title.remove_theme_color_override("font_color")

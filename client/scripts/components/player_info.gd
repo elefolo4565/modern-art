@@ -13,15 +13,15 @@ var _normal_style: StyleBoxFlat
 func _ready() -> void:
 	# Normal: transparent background, no border
 	_normal_style = StyleBoxFlat.new()
-	_normal_style.bg_color = Color(1, 1, 1, 0.05)
+	_normal_style.bg_color = Color(0, 0, 0, 0.04)
 	_normal_style.set_corner_radius_all(6)
 	_normal_style.set_border_width_all(0)
 	_normal_style.set_content_margin_all(4)
 
 	# Active: yellow rounded border
 	_active_style = StyleBoxFlat.new()
-	_active_style.bg_color = Color(1, 0.9, 0.3, 0.08)
-	_active_style.border_color = Color(1, 0.9, 0.3, 1)
+	_active_style.bg_color = Color(0.9, 0.7, 0.1, 0.12)
+	_active_style.border_color = Color(0.85, 0.65, 0.1, 1)
 	_active_style.set_corner_radius_all(10)
 	_active_style.set_border_width_all(2)
 	_active_style.set_content_margin_all(4)
@@ -49,11 +49,11 @@ func update_display() -> void:
 	hand_label.text = "x%d" % p.get("hand_count", 0)
 
 	if is_current:
-		name_label.add_theme_color_override("font_color", Color(1, 0.9, 0.3, 1))
+		name_label.add_theme_color_override("font_color", Color(0.8, 0.6, 0.05, 1))
 	elif is_me:
-		name_label.add_theme_color_override("font_color", Color(0.5, 0.8, 1, 1))
+		name_label.add_theme_color_override("font_color", Color(0.2, 0.5, 0.8, 1))
 	else:
-		name_label.add_theme_color_override("font_color", Color.WHITE)
+		name_label.remove_theme_color_override("font_color")
 
 	# Active player border
 	if is_current:
@@ -93,9 +93,9 @@ func _start_pulse() -> void:
 	_stop_pulse()
 	_pulse_tween = create_tween().set_loops()
 	_pulse_tween.tween_property(_active_style, "border_color",
-		Color(1, 0.9, 0.3, 0.3), 0.9).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		Color(0.85, 0.65, 0.1, 0.3), 0.9).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	_pulse_tween.tween_property(_active_style, "border_color",
-		Color(1, 0.9, 0.3, 1.0), 0.9).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		Color(0.85, 0.65, 0.1, 1.0), 0.9).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 
 func _stop_pulse() -> void:
 	if _pulse_tween:

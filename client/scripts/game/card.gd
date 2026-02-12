@@ -70,7 +70,7 @@ func _update_modulate() -> void:
 	if is_disabled:
 		modulate = Color(0.4, 0.4, 0.4, 0.6)
 	elif is_selected:
-		modulate = Color(1.2, 1.2, 1.4, 1)
+		modulate = Color(1.1, 1.1, 1.15, 1)
 	else:
 		modulate = Color.WHITE
 

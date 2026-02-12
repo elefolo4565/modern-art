@@ -38,7 +38,7 @@ func _display_results() -> void:
 		rank_label.add_theme_font_size_override("font_size", 24)
 		rank_label.custom_minimum_size = Vector2(50, 0)
 		if i == 0:
-			rank_label.add_theme_color_override("font_color", Color(1, 0.85, 0.2, 1))
+			rank_label.add_theme_color_override("font_color", Color(0.8, 0.6, 0.1, 1))
 		row.add_child(rank_label)
 
 		var name_lbl := Label.new()
@@ -46,7 +46,7 @@ func _display_results() -> void:
 		name_lbl.add_theme_font_size_override("font_size", 24)
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if i == 0:
-			name_lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.2, 1))
+			name_lbl.add_theme_color_override("font_color", Color(0.8, 0.6, 0.1, 1))
 		row.add_child(name_lbl)
 
 		var money_lbl := Label.new()
@@ -54,7 +54,7 @@ func _display_results() -> void:
 		money_lbl.add_theme_font_size_override("font_size", 24)
 		money_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		if i == 0:
-			money_lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.2, 1))
+			money_lbl.add_theme_color_override("font_color", Color(0.8, 0.6, 0.1, 1))
 		row.add_child(money_lbl)
 
 		player_results.add_child(row)

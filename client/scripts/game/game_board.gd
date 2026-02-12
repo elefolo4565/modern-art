@@ -373,7 +373,7 @@ func _build_paintings_content() -> void:
 		name_lbl.text = pname + (" *" if is_me else "")
 		name_lbl.add_theme_font_size_override("font_size", 18)
 		if is_me:
-			name_lbl.add_theme_color_override("font_color", Color(0.5, 0.8, 1, 1))
+			name_lbl.add_theme_color_override("font_color", Color(0.2, 0.5, 0.8, 1))
 		paintings_content.add_child(name_lbl)
 
 		# Artist paintings list
