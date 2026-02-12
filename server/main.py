@@ -73,6 +73,7 @@ def create_app(static_dir: str = None) -> web.Application:
                 headers = {
                     "Cross-Origin-Opener-Policy": "same-origin",
                     "Cross-Origin-Embedder-Policy": "require-corp",
+                    "Cache-Control": "no-cache, must-revalidate",
                 }
                 return web.FileResponse(index_path, headers=headers)
             return web.Response(text="Modern Art Server Running", status=200)
@@ -86,6 +87,7 @@ def create_app(static_dir: str = None) -> web.Application:
                 headers = {
                     "Cross-Origin-Opener-Policy": "same-origin",
                     "Cross-Origin-Embedder-Policy": "require-corp",
+                    "Cache-Control": "no-cache, must-revalidate",
                 }
                 # Set correct content types
                 if file_path.endswith(".wasm"):
