@@ -4,11 +4,11 @@ extends PanelContainer
 
 @onready var auction_title: Label = $MarginContainer/VBox/AuctionTitle
 @onready var auction_card_bar: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card1Col/AuctionCardBar
-@onready var auction_art_area: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card1Col/AuctionArtArea
+@onready var auction_art_area: TextureRect = $MarginContainer/VBox/CardDisplayRow/Card1Col/AuctionArtArea
 @onready var artist_label: Label = $MarginContainer/VBox/CardDisplayRow/Card1Col/ArtistLabel
 @onready var card2_col: VBoxContainer = $MarginContainer/VBox/CardDisplayRow/Card2Col
 @onready var double_card_bar: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card2Col/DoubleCardBar
-@onready var double_art_area: ColorRect = $MarginContainer/VBox/CardDisplayRow/Card2Col/DoubleArtArea
+@onready var double_art_area: TextureRect = $MarginContainer/VBox/CardDisplayRow/Card2Col/DoubleArtArea
 @onready var double_artist_label: Label = $MarginContainer/VBox/CardDisplayRow/Card2Col/DoubleArtistLabel
 @onready var auction_type_label: Label = $MarginContainer/VBox/AuctionTypeLabel
 @onready var seller_label: Label = $MarginContainer/VBox/SellerLabel
@@ -61,7 +61,7 @@ func _on_auction_started(data: Dictionary) -> void:
 
 	auction_title.text = Locale.t("auction_title")
 	auction_card_bar.color = color
-	auction_art_area.color = Color(color.r, color.g, color.b, 0.3)
+	_set_art(auction_art_area, card)
 	artist_label.text = Locale.t(artist)
 	artist_label.add_theme_color_override("font_color", color)
 
@@ -72,7 +72,7 @@ func _on_auction_started(data: Dictionary) -> void:
 		var artist2: String = double_card.get("artist", "")
 		var color2: Color = GameState.ARTIST_COLORS.get(artist2, Color.WHITE)
 		double_card_bar.color = color2
-		double_art_area.color = Color(color2.r, color2.g, color2.b, 0.3)
+		_set_art(double_art_area, double_card)
 		double_artist_label.text = Locale.t(artist2)
 		double_artist_label.add_theme_color_override("font_color", color2)
 	else:
@@ -176,6 +176,15 @@ func _on_auction_bid(data: Dictionary) -> void:
 			Locale.format_money(amount),
 			pname
 		]
+		# Slide-in animation
+		bid_info_label.pivot_offset = bid_info_label.size / 2.0
+		bid_info_label.scale = Vector2(1.15, 1.15)
+		bid_info_label.modulate = Color(1, 1, 1, 0.3)
+		var tween := create_tween().set_parallel(true)
+		tween.tween_property(bid_info_label, "scale", Vector2(1, 1), 0.25) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+		tween.tween_property(bid_info_label, "modulate:a", 1.0, 0.15) \
+			.set_ease(Tween.EASE_OUT)
 
 	_update_controls(can_act)
 
@@ -186,8 +195,26 @@ func _on_auction_ended(data: Dictionary) -> void:
 	result_label.visible = true
 	if winner_name != "" and price > 0:
 		result_label.text = Locale.tf("auction_winner", [winner_name, Locale.format_money(price)])
+		_spawn_confetti()
 	elif winner_name != "":
 		result_label.text = Locale.t("auction_no_buyer")
+
+	# Bounce-in animation with color flash
+	await get_tree().process_frame
+	result_label.pivot_offset = result_label.size / 2.0
+	result_label.scale = Vector2(2.0, 2.0)
+	result_label.modulate = Color(1, 0.85, 0.2, 0)
+	var tween := create_tween()
+	# Phase 1: Burst in with golden flash
+	tween.set_parallel(true)
+	tween.tween_property(result_label, "scale", Vector2(1.0, 1.0), 0.4) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(result_label, "modulate:a", 1.0, 0.15) \
+		.set_ease(Tween.EASE_OUT)
+	# Phase 2: Color settles from golden to white
+	tween.set_parallel(false)
+	tween.tween_property(result_label, "modulate", Color(1, 1, 1, 1), 0.3) \
+		.set_ease(Tween.EASE_IN_OUT)
 
 	# Hide controls
 	bid_button.visible = false
@@ -234,3 +261,54 @@ func _on_set_price_pressed() -> void:
 
 func _on_quick_bid(increment: int) -> void:
 	bid_input.value += increment
+
+func _spawn_confetti() -> void:
+	var colors := [
+		Color(1, 0.2, 0.2), Color(1, 0.8, 0.1), Color(0.2, 0.8, 0.3),
+		Color(0.3, 0.5, 1), Color(0.9, 0.3, 0.8), Color(1, 0.5, 0.1),
+	]
+	for side in [-1, 1]:
+		var p := CPUParticles2D.new()
+		p.one_shot = true
+		p.explosiveness = 0.95
+		p.amount = 20
+		p.lifetime = 1.5
+		p.position = Vector2(size.x / 2.0, size.y * 0.5)
+		p.direction = Vector2(side * 0.6, -1)
+		p.spread = 35.0
+		p.initial_velocity_min = 250.0
+		p.initial_velocity_max = 450.0
+		p.gravity = Vector2(0, 350)
+		p.scale_amount_min = 3.0
+		p.scale_amount_max = 6.0
+		p.angular_velocity_min = -300.0
+		p.angular_velocity_max = 300.0
+		# Random confetti colors
+		var grad := Gradient.new()
+		grad.colors = colors
+		grad.offsets = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+		p.color_initial_ramp = grad
+		# Fade out over lifetime
+		var fade := Gradient.new()
+		fade.colors = [Color.WHITE, Color(1, 1, 1, 0)]
+		fade.offsets = [0.7, 1.0]
+		p.color_ramp = fade
+		add_child(p)
+		p.emitting = true
+	# Clean up after particles finish
+	await get_tree().create_timer(2.0).timeout
+	for child in get_children():
+		if child is CPUParticles2D:
+			child.queue_free()
+
+func _set_art(area: TextureRect, card_data: Dictionary) -> void:
+	var artist: String = card_data.get("artist", "")
+	var card_id: String = str(card_data.get("card_id", ""))
+	var card_art = get_node_or_null("/root/CardArt")
+	if card_id != "" and card_art:
+		area.texture = card_art.get_card_texture(int(card_id), artist)
+	else:
+		var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
+		var img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+		img.fill(Color(color.r, color.g, color.b, 0.3))
+		area.texture = ImageTexture.create_from_image(img)

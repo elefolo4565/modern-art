@@ -37,10 +37,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 8)
 color = Color(1, 1, 1, 1)
 
-[node name="AuctionArtArea" type="ColorRect" parent="MarginContainer/VBox/CardDisplayRow/Card1Col"]
+[node name="AuctionArtArea" type="TextureRect" parent="MarginContainer/VBox/CardDisplayRow/Card1Col"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 50)
-color = Color(0.5, 0.5, 0.5, 0.3)
+custom_minimum_size = Vector2(0, 80)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ArtistLabel" type="Label" parent="MarginContainer/VBox/CardDisplayRow/Card1Col"]
 layout_mode = 2
@@ -57,10 +58,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 8)
 color = Color(1, 1, 1, 1)
 
-[node name="DoubleArtArea" type="ColorRect" parent="MarginContainer/VBox/CardDisplayRow/Card2Col"]
+[node name="DoubleArtArea" type="TextureRect" parent="MarginContainer/VBox/CardDisplayRow/Card2Col"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 50)
-color = Color(0.5, 0.5, 0.5, 0.3)
+custom_minimum_size = Vector2(0, 80)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="DoubleArtistLabel" type="Label" parent="MarginContainer/VBox/CardDisplayRow/Card2Col"]
 layout_mode = 2
@@ -156,6 +158,6 @@ text = "+50K"
 
 [node name="ResultLabel" type="Label" parent="MarginContainer/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 visible = false

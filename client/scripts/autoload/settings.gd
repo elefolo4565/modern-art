@@ -19,6 +19,26 @@ var bg_color_index: int = 0
 
 func _ready() -> void:
 	_load_settings()
+	get_tree().node_added.connect(_on_node_added)
+
+func _on_node_added(node: Node) -> void:
+	if node is Button:
+		node.button_down.connect(_on_button_down.bind(node))
+		node.button_up.connect(_on_button_up.bind(node))
+
+func _on_button_down(btn: Button) -> void:
+	if not is_instance_valid(btn) or not btn.is_inside_tree():
+		return
+	btn.pivot_offset = btn.size / 2.0
+	btn.scale = Vector2(0.92, 0.92)
+	btn.modulate = Color(0.85, 0.85, 0.85, 1)
+
+func _on_button_up(btn: Button) -> void:
+	if not is_instance_valid(btn) or not btn.is_inside_tree():
+		return
+	btn.pivot_offset = btn.size / 2.0
+	btn.scale = Vector2(1.0, 1.0)
+	btn.modulate = Color.WHITE
 
 func get_bg_color() -> Color:
 	return BG_PRESETS[bg_color_index].color

@@ -28,12 +28,9 @@ signal go_to_title
 @onready var log_scroll: ScrollContainer = $LogOverlay/LogMargin/LogVBox/LogScroll
 @onready var log_content: VBoxContainer = $LogOverlay/LogMargin/LogVBox/LogScroll/LogContent
 @onready var log_close_button: Button = $LogOverlay/LogMargin/LogVBox/LogTitleBar/LogCloseButton
-@onready var paintings_overlay: PanelContainer = $PaintingsOverlay
-@onready var paintings_title_label: Label = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsTitleBar/PaintingsTitleLabel
-@onready var paintings_content: VBoxContainer = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsScroll/PaintingsContent
-@onready var paintings_close_button: Button = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsTitleBar/PaintingsCloseButton
 
 @onready var bg_rect: ColorRect = $BG
+@onready var round_banner: Label = $RoundBanner
 
 const PLAYER_INFO_SCENE := preload("res://scenes/components/player_info.tscn")
 const AUCTION_ICONS := {"open": ">>", "once_around": "->", "sealed": "[]", "fixed_price": "$=", "double": "x2"}
@@ -43,6 +40,7 @@ var _double_second_index: int = -1
 var _player_infos: Array = []
 var _preview_tween: Tween = null
 var _preview_gen: int = 0
+var _round_end_artist: String = ""
 
 func _ready() -> void:
 	play_card_button.pressed.connect(_on_play_card_pressed)
@@ -50,11 +48,8 @@ func _ready() -> void:
 	double_no_btn.pressed.connect(_on_double_no)
 	hand_area.card_selected.connect(_on_card_selected)
 	market_board.log_button_pressed.connect(_on_log_button_pressed)
-	market_board.paintings_button_pressed.connect(_on_paintings_button_pressed)
 	log_close_button.pressed.connect(_on_log_close_pressed)
-	paintings_close_button.pressed.connect(_on_paintings_close_pressed)
 	log_title_label.text = Locale.t("log_title")
-	paintings_title_label.text = Locale.t("paintings_title")
 
 	GameState.game_started.connect(_on_game_started)
 	GameState.turn_changed.connect(_update_turn)
@@ -69,6 +64,7 @@ func _ready() -> void:
 	Locale.language_changed.connect(_update_texts)
 	Settings.bg_color_changed.connect(func(): bg_rect.color = Settings.get_bg_color())
 	bg_rect.color = Settings.get_bg_color()
+	_start_play_button_pulse()
 
 	# Initialize if game already started (scene reload)
 	if GameState.players.size() > 0:
@@ -80,6 +76,7 @@ func _on_game_started(_data: Dictionary) -> void:
 	_refresh_all()
 	_update_recent_log()
 	hand_area.request_deal_animation()
+	_show_round_banner(GameState.current_round)
 
 func _build_player_list() -> void:
 	# Clear
@@ -162,6 +159,8 @@ func _on_card_played(data: Dictionary) -> void:
 	_update_info_bar()
 	market_board.update_display()
 	_update_player_infos()
+	if data.get("board_count", 0) >= 5:
+		_round_end_artist = data.get("artist", "")
 	if data.get("is_double", false):
 		var pname: String = data.get("player_name", "???")
 		var artist: String = Locale.t(data.get("artist", ""))
@@ -218,7 +217,12 @@ func _on_round_ended(_data: Dictionary) -> void:
 	market_board.update_display()
 	_update_player_infos()
 	_update_recent_log()
+	if _round_end_artist != "":
+		var artist_name := _round_end_artist
+		_round_end_artist = ""
+		await _show_round_end_notice(artist_name)
 	hand_area.request_deal_animation()
+	_show_round_banner(GameState.current_round)
 
 func _on_game_ended(_data: Dictionary) -> void:
 	# Transition to result screen after a delay
@@ -236,9 +240,9 @@ func _show_card_preview(card_index: int) -> void:
 
 	preview_artist_bar.color = color
 	var card_id: String = str(data.get("card_id", ""))
-	var img_path := "res://assets/cards/%s.png" % card_id
-	if card_id != "" and ResourceLoader.exists(img_path):
-		preview_art_area.texture = load(img_path)
+	var card_art = get_node_or_null("/root/CardArt")
+	if card_id != "" and card_art:
+		preview_art_area.texture = card_art.get_card_texture(int(card_id), artist)
 		preview_art_area.self_modulate = Color.WHITE
 	else:
 		var img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
@@ -277,19 +281,55 @@ func _hide_card_preview() -> void:
 	_preview_tween.tween_property(card_preview, "position:x", card_preview.position.x + 300, 0.15).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
 	_preview_tween.chain().tween_callback(func(): card_preview.visible = false)
 
+func _show_round_end_notice(artist: String) -> void:
+	var text := Locale.tf("round_end_notice", [Locale.t(artist)])
+	round_banner.text = text
+	round_banner.visible = true
+	round_banner.modulate = Color(1, 1, 1, 0)
+	await get_tree().process_frame
+	var vp_w := get_viewport_rect().size.x
+	var banner_w := round_banner.size.x
+	round_banner.position.x = (vp_w - banner_w) / 2.0
+	var tw := create_tween()
+	tw.tween_property(round_banner, "modulate:a", 1.0, 0.3)
+	tw.tween_interval(3.0)
+	tw.tween_property(round_banner, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(func(): round_banner.visible = false)
+	await tw.finished
+
+func _show_round_banner(round_num: int) -> void:
+	round_banner.text = "Round %d" % round_num
+	round_banner.visible = true
+	round_banner.modulate = Color(1, 1, 1, 0)
+	# Wait for layout so size is computed
+	await get_tree().process_frame
+	var vp_w := get_viewport_rect().size.x
+	var banner_w := round_banner.size.x
+	round_banner.position.x = vp_w
+	var center_x := (vp_w - banner_w) / 2.0
+	var tw := create_tween()
+	# Slide in from right + fade in
+	tw.set_parallel(true)
+	tw.tween_property(round_banner, "position:x", center_x, 0.5) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(round_banner, "modulate:a", 1.0, 0.3)
+	# Pause at center
+	tw.set_parallel(false)
+	tw.tween_interval(1.5)
+	# Slide out to left + fade out
+	tw.set_parallel(true)
+	tw.tween_property(round_banner, "position:x", -banner_w - 50, 0.5) \
+		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(round_banner, "modulate:a", 0.0, 0.4)
+	tw.set_parallel(false)
+	tw.tween_callback(func(): round_banner.visible = false)
+
 func _on_log_button_pressed() -> void:
 	_build_log_content()
 	log_overlay.visible = true
 
 func _on_log_close_pressed() -> void:
 	log_overlay.visible = false
-
-func _on_paintings_button_pressed() -> void:
-	_build_paintings_content()
-	paintings_overlay.visible = true
-
-func _on_paintings_close_pressed() -> void:
-	paintings_overlay.visible = false
 
 func _update_recent_log() -> void:
 	for child in recent_log.get_children():
@@ -306,15 +346,21 @@ func _update_recent_log() -> void:
 		var entry: Dictionary = entries[i]
 		var lbl := Label.new()
 		var rd: int = entry.get("round", 0)
-		var seller: String = entry.get("seller_name", "???")
-		var artist: String = Locale.t(entry.get("artist", ""))
-		var atype: String = Locale.t("auction_" + entry.get("auction_type", ""))
 		var color: Color = GameState.ARTIST_COLORS.get(entry.get("artist", ""), Color.WHITE)
-		var double_tag: String = " [%s]" % Locale.t("double_play") if entry.get("is_double", false) else ""
 
-		if entry.get("no_buyer", false):
+		if entry.get("round_end", false):
+			var pname: String = entry.get("player_name", "???")
+			lbl.text = "R%d: %s" % [rd, Locale.tf("round_end_log", [pname])]
+		elif entry.get("no_buyer", false):
+			var artist: String = Locale.t(entry.get("artist", ""))
+			var atype: String = Locale.t("auction_" + entry.get("auction_type", ""))
+			var double_tag: String = " [%s]" % Locale.t("double_play") if entry.get("is_double", false) else ""
 			lbl.text = "R%d: %s [%s]%s %s" % [rd, artist, atype, double_tag, Locale.t("auction_no_buyer")]
 		else:
+			var artist: String = Locale.t(entry.get("artist", ""))
+			var atype: String = Locale.t("auction_" + entry.get("auction_type", ""))
+			var double_tag: String = " [%s]" % Locale.t("double_play") if entry.get("is_double", false) else ""
+			var seller: String = entry.get("seller_name", "???")
 			var winner: String = entry.get("winner_name", "???")
 			var price: String = Locale.format_money(entry.get("price", 0))
 			lbl.text = "R%d: %s [%s]%s %s->%s (%s)" % [rd, artist, atype, double_tag, seller, winner, price]
@@ -330,41 +376,8 @@ func _build_log_content() -> void:
 
 	log_title_label.text = Locale.t("log_title")
 
-	if GameState.auction_log.is_empty():
-		var empty_lbl := Label.new()
-		empty_lbl.text = Locale.t("log_empty")
-		empty_lbl.add_theme_font_size_override("font_size", 16)
-		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty_lbl.modulate = Color(1, 1, 1, 0.5)
-		log_content.add_child(empty_lbl)
-		return
-
-	for entry in GameState.auction_log:
-		var lbl := Label.new()
-		var rd: int = entry.get("round", 0)
-		var seller: String = entry.get("seller_name", "???")
-		var artist: String = Locale.t(entry.get("artist", ""))
-		var atype: String = Locale.t("auction_" + entry.get("auction_type", ""))
-		var color: Color = GameState.ARTIST_COLORS.get(entry.get("artist", ""), Color.WHITE)
-		var double_tag: String = " [%s]" % Locale.t("double_play") if entry.get("is_double", false) else ""
-
-		if entry.get("no_buyer", false):
-			lbl.text = "R%d: %s [%s]%s %s" % [rd, artist, atype, double_tag, Locale.t("auction_no_buyer")]
-		else:
-			var winner: String = entry.get("winner_name", "???")
-			var price: String = Locale.format_money(entry.get("price", 0))
-			lbl.text = "R%d: %s [%s]%s %s -> %s (%s)" % [rd, artist, atype, double_tag, seller, winner, price]
-
-		lbl.add_theme_font_size_override("font_size", 14)
-		lbl.add_theme_color_override("font_color", color)
-		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		log_content.add_child(lbl)
-
-func _build_paintings_content() -> void:
-	for child in paintings_content.get_children():
-		child.queue_free()
-
-	paintings_title_label.text = Locale.t("paintings_title")
+	# --- Paintings section ---
+	log_content.add_child(_make_section_header(Locale.t("paintings_title")))
 
 	for i in range(GameState.players.size()):
 		var p: Dictionary = GameState.players[i]
@@ -372,15 +385,13 @@ func _build_paintings_content() -> void:
 		var is_me := (i == GameState.my_index)
 		var paintings: Dictionary = p.get("paintings", {})
 
-		# Player name header
 		var name_lbl := Label.new()
 		name_lbl.text = pname + (" *" if is_me else "")
-		name_lbl.add_theme_font_size_override("font_size", 18)
+		name_lbl.add_theme_font_size_override("font_size", 16)
 		if is_me:
 			name_lbl.add_theme_color_override("font_color", Color(0.2, 0.5, 0.8, 1))
-		paintings_content.add_child(name_lbl)
+		log_content.add_child(name_lbl)
 
-		# Artist paintings list
 		var has_any := false
 		for artist in GameState.ARTISTS:
 			var count: int = paintings.get(artist, 0)
@@ -392,16 +403,92 @@ func _build_paintings_content() -> void:
 			row.text = "  %s x%d" % [Locale.t(artist), count]
 			row.add_theme_font_size_override("font_size", 14)
 			row.add_theme_color_override("font_color", color)
-			paintings_content.add_child(row)
+			log_content.add_child(row)
 
 		if not has_any:
 			var none_lbl := Label.new()
 			none_lbl.text = "  -"
 			none_lbl.add_theme_font_size_override("font_size", 14)
 			none_lbl.modulate = Color(1, 1, 1, 0.4)
-			paintings_content.add_child(none_lbl)
+			log_content.add_child(none_lbl)
 
-		# Separator between players (except last)
 		if i < GameState.players.size() - 1:
 			var sep := HSeparator.new()
-			paintings_content.add_child(sep)
+			log_content.add_child(sep)
+
+	# --- Auction log section ---
+	log_content.add_child(_make_section_header(Locale.t("log_auction_history")))
+
+	if GameState.auction_log.is_empty():
+		var empty_lbl := Label.new()
+		empty_lbl.text = Locale.t("log_empty")
+		empty_lbl.add_theme_font_size_override("font_size", 14)
+		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty_lbl.modulate = Color(1, 1, 1, 0.5)
+		log_content.add_child(empty_lbl)
+		return
+
+	var last_round := -1
+	for entry in GameState.auction_log:
+		var lbl := Label.new()
+		var rd: int = entry.get("round", 0)
+		if last_round >= 0 and rd != last_round:
+			var round_sep := HSeparator.new()
+			var sep_style := StyleBoxLine.new()
+			sep_style.color = Color(0.5, 0.48, 0.45, 0.5)
+			sep_style.thickness = 2
+			round_sep.add_theme_stylebox_override("separator", sep_style)
+			log_content.add_child(round_sep)
+		last_round = rd
+		var color: Color = GameState.ARTIST_COLORS.get(entry.get("artist", ""), Color.WHITE)
+
+		if entry.get("round_end", false):
+			var pname: String = entry.get("player_name", "???")
+			lbl.text = "R%d: %s" % [rd, Locale.tf("round_end_log", [pname])]
+		elif entry.get("no_buyer", false):
+			var artist: String = Locale.t(entry.get("artist", ""))
+			var atype: String = Locale.t("auction_" + entry.get("auction_type", ""))
+			var double_tag: String = " [%s]" % Locale.t("double_play") if entry.get("is_double", false) else ""
+			lbl.text = "R%d: %s [%s]%s %s" % [rd, artist, atype, double_tag, Locale.t("auction_no_buyer")]
+		else:
+			var artist: String = Locale.t(entry.get("artist", ""))
+			var atype: String = Locale.t("auction_" + entry.get("auction_type", ""))
+			var double_tag: String = " [%s]" % Locale.t("double_play") if entry.get("is_double", false) else ""
+			var seller: String = entry.get("seller_name", "???")
+			var winner: String = entry.get("winner_name", "???")
+			var price: String = Locale.format_money(entry.get("price", 0))
+			lbl.text = "R%d: %s [%s]%s %s -> %s (%s)" % [rd, artist, atype, double_tag, seller, winner, price]
+
+		lbl.add_theme_font_size_override("font_size", 14)
+		lbl.add_theme_color_override("font_color", color)
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		log_content.add_child(lbl)
+
+func _start_play_button_pulse() -> void:
+	await get_tree().process_frame
+	play_card_button.pivot_offset = play_card_button.size / 2.0
+	var tw := create_tween().set_loops()
+	tw.tween_property(play_card_button, "scale", Vector2(1.04, 1.04), 0.9) \
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(play_card_button, "scale", Vector2(1.0, 1.0), 0.9) \
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+
+func _make_section_header(title: String) -> PanelContainer:
+	var panel := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.35, 0.33, 0.3, 1)
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 6
+	style.content_margin_bottom = 6
+	panel.add_theme_stylebox_override("panel", style)
+	var lbl := Label.new()
+	lbl.text = title
+	lbl.add_theme_font_size_override("font_size", 18)
+	lbl.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+	panel.add_child(lbl)
+	return panel

@@ -61,7 +61,7 @@ const ARTIST_COLORS := {
 	"Orange Tarou": Color(0.95, 0.55, 0.15),   # Orange
 	"Green Tarou": Color(0.2, 0.75, 0.35),     # Green
 	"Blue Tarou": Color(0.25, 0.5, 0.9),       # Blue
-	"Yellow Tarou": Color(0.95, 0.85, 0.2),    # Yellow
+	"Yellow Tarou": Color(0.78, 0.65, 0.08),    # Yellow (darkened for readability)
 	"Red Tarou": Color(0.9, 0.2, 0.25),        # Red
 }
 const AUCTION_TYPES := ["open", "once_around", "sealed", "fixed_price", "double"]
@@ -161,6 +161,15 @@ func _handle_card_played(data: Dictionary) -> void:
 	var artist: String = data.get("artist", "")
 	if artist != "":
 		board[artist] = data.get("board_count", board.get(artist, 0))
+	# 5枚目でラウンド終了 → オークションなしなのでここでログに記録
+	if data.get("board_count", 0) >= 5:
+		var pname: String = data.get("player_name", "???")
+		auction_log.append({
+			"round": current_round,
+			"artist": artist,
+			"player_name": pname,
+			"round_end": true,
+		})
 	card_played.emit(data)
 
 var _auction_is_double: bool = false

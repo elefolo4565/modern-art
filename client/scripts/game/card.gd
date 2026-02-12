@@ -46,13 +46,12 @@ func _update_display() -> void:
 	auction_label.text = "%s %s" % [icon, Locale.t("auction_" + atype)]
 
 func _load_card_art(artist: String, card_id: String) -> void:
-	var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
-	var img_path := "res://assets/cards/%s.png" % card_id
-	if card_id != "" and ResourceLoader.exists(img_path):
-		art_area.texture = load(img_path)
+	var card_art = get_node_or_null("/root/CardArt")
+	if card_id != "" and card_art:
+		art_area.texture = card_art.get_card_texture(int(card_id), artist)
 		art_area.self_modulate = Color.WHITE
 	else:
-		# Fallback: solid color block (same as before)
+		var color: Color = GameState.ARTIST_COLORS.get(artist, Color.WHITE)
 		var img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
 		img.fill(Color(color.r, color.g, color.b, 0.3))
 		art_area.texture = ImageTexture.create_from_image(img)

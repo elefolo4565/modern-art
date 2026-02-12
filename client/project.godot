@@ -21,6 +21,7 @@ Network="*res://scripts/autoload/network.gd"
 GameState="*res://scripts/autoload/game_state.gd"
 Locale="*res://scripts/autoload/locale.gd"
 Settings="*res://scripts/autoload/settings.gd"
+CardArt="*res://scripts/autoload/card_art.gd"
 
 [display]
 

@@ -21,11 +21,6 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 10
 
-[node name="PaintingsButton" type="Button" parent="HBox/ButtonsBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 10
-
 [node name="GuideCol" type="VBoxContainer" parent="HBox"]
 layout_mode = 2
 custom_minimum_size = Vector2(32, 0)

@@ -91,6 +91,8 @@ func _load_translations() -> void:
 		"auction_enter_bid": {"ja": "入札額を入力", "en": "Enter bid amount"},
 
 		# Round/Game end
+		"round_end_notice": {"ja": "%s が5枚提出されました\nラウンドを終了します", "en": "%s reached 5 cards\nEnding the round"},
+		"round_end_log": {"ja": "%s が5枚目を提出 → ラウンド終了", "en": "%s played 5th card → Round ended"},
 		"round_end_title": {"ja": "ラウンド終了", "en": "Round Over"},
 		"round_end_values": {"ja": "今ラウンドの価値", "en": "Round Values"},
 		"round_end_cumulative": {"ja": "累積価値", "en": "Cumulative Values"},
@@ -110,9 +112,9 @@ func _load_translations() -> void:
 
 		# Log & Paintings
 		"log_button": {"ja": "ログ", "en": "Log"},
-		"log_title": {"ja": "取引ログ", "en": "Auction Log"},
-		"paintings_button": {"ja": "絵画", "en": "Art"},
-		"paintings_title": {"ja": "所持絵画一覧", "en": "Owned Paintings"},
+		"log_title": {"ja": "取引ログ", "en": "Log"},
+		"paintings_title": {"ja": "所持絵画", "en": "Paintings"},
+		"log_auction_history": {"ja": "取引履歴", "en": "History"},
 		"log_empty": {"ja": "取引記録はまだありません", "en": "No transactions yet"},
 		"double_play": {"ja": "x2 ダブル", "en": "x2 Double"},
 

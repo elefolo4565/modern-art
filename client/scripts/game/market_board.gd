@@ -3,12 +3,10 @@ extends PanelContainer
 ## Compact market board showing artist values and board counts.
 
 signal log_button_pressed
-signal paintings_button_pressed
 
 @onready var hbox: HBoxContainer = $HBox
 @onready var guide_col: VBoxContainer = $HBox/GuideCol
 @onready var log_button: Button = $HBox/ButtonsBox/LogButton
-@onready var paintings_button: Button = $HBox/ButtonsBox/PaintingsButton
 
 var _artist_labels: Dictionary = {}
 var _value_labels: Dictionary = {}
@@ -17,9 +15,7 @@ var _pending_labels: Dictionary = {}
 
 func _ready() -> void:
 	log_button.text = Locale.t("log_button")
-	paintings_button.text = Locale.t("paintings_button")
 	log_button.pressed.connect(func(): log_button_pressed.emit())
-	paintings_button.pressed.connect(func(): paintings_button_pressed.emit())
 	_build_board()
 	GameState.state_changed.connect(update_display)
 	GameState.hand_updated.connect(update_display)
@@ -28,7 +24,6 @@ func _ready() -> void:
 
 func _rebuild() -> void:
 	log_button.text = Locale.t("log_button")
-	paintings_button.text = Locale.t("paintings_button")
 	_build_board()
 
 func _build_board() -> void:
@@ -43,22 +38,31 @@ func _build_board() -> void:
 	_settled_labels.clear()
 	_pending_labels.clear()
 
+	# Row heights must match across guide and artist columns
+	var row_heights := [18, 22, 18, 18]
+	var sep_style := StyleBoxLine.new()
+	sep_style.color = Color(0.7, 0.68, 0.65, 0.4)
+	sep_style.thickness = 1
+
 	# Build guide column labels
 	for child in guide_col.get_children():
 		child.queue_free()
 	var guide_color := Color(0.45, 0.43, 0.4, 1)
 	var guide_rows := ["", "market_value", "market_count", "market_bid"]
-	for key in guide_rows:
+	for ri in range(guide_rows.size()):
+		if ri > 0:
+			var s := HSeparator.new()
+			s.add_theme_stylebox_override("separator", sep_style)
+			guide_col.add_child(s)
 		var lbl := Label.new()
+		var key: String = guide_rows[ri]
 		lbl.text = Locale.t(key) if key != "" else ""
 		lbl.add_theme_font_size_override("font_size", 9)
 		lbl.add_theme_color_override("font_color", guide_color)
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.custom_minimum_size.y = row_heights[ri]
 		guide_col.add_child(lbl)
-
-	# Add separator
-	var sep := VSeparator.new()
-	hbox.add_child(sep)
 
 	for artist in GameState.ARTISTS:
 		var col := VBoxContainer.new()
@@ -73,33 +77,53 @@ func _build_board() -> void:
 		name_lbl.text = _get_abbreviation(artist)
 		name_lbl.add_theme_font_size_override("font_size", 11)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_lbl.add_theme_color_override("font_color", color)
+		name_lbl.custom_minimum_size.y = row_heights[0]
 		col.add_child(name_lbl)
 		_artist_labels[artist] = name_lbl
+
+		var s1 := HSeparator.new()
+		s1.add_theme_stylebox_override("separator", sep_style)
+		col.add_child(s1)
 
 		# Row 2: Cumulative market value
 		var val_lbl := Label.new()
 		val_lbl.text = "0"
 		val_lbl.add_theme_font_size_override("font_size", 13)
 		val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		val_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		val_lbl.custom_minimum_size.y = row_heights[1]
 		col.add_child(val_lbl)
 		_value_labels[artist] = val_lbl
+
+		var s2 := HSeparator.new()
+		s2.add_theme_stylebox_override("separator", sep_style)
+		col.add_child(s2)
 
 		# Row 3: Settled count (completed auctions this round)
 		var settled_lbl := Label.new()
 		settled_lbl.text = ""
 		settled_lbl.add_theme_font_size_override("font_size", 11)
 		settled_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		settled_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		settled_lbl.add_theme_color_override("font_color", Color(0.2, 0.6, 0.3))
+		settled_lbl.custom_minimum_size.y = row_heights[2]
 		col.add_child(settled_lbl)
 		_settled_labels[artist] = settled_lbl
+
+		var s3 := HSeparator.new()
+		s3.add_theme_stylebox_override("separator", sep_style)
+		col.add_child(s3)
 
 		# Row 4: Pending count (currently in auction)
 		var pending_lbl := Label.new()
 		pending_lbl.text = ""
 		pending_lbl.add_theme_font_size_override("font_size", 11)
 		pending_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		pending_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		pending_lbl.add_theme_color_override("font_color", Color(0.8, 0.6, 0.1))
+		pending_lbl.custom_minimum_size.y = row_heights[3]
 		col.add_child(pending_lbl)
 		_pending_labels[artist] = pending_lbl
 
