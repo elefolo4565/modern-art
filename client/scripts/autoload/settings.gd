@@ -30,7 +30,7 @@ func set_bg_color_index(idx: int) -> void:
 
 func get_flow_text_color() -> Color:
 	var bg := get_bg_color()
-	return Color(bg.r - 0.07, bg.g - 0.08, bg.b - 0.10, 0.13)
+	return Color(bg.r - 0.07, bg.g - 0.08, bg.b - 0.10, 0.25)
 
 func _load_settings() -> void:
 	var config := ConfigFile.new()

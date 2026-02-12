@@ -9,11 +9,13 @@ var _texts: Array[Label] = []
 
 const SPAWN_INTERVAL := 1.8
 const TEXT := "modern art"
-const FALLBACK_COLOR := Color(0.88, 0.85, 0.78, 0.13)
+const FALLBACK_COLOR := Color(0.88, 0.85, 0.78, 0.25)
 const MIN_SIZE := 28
 const MAX_SIZE := 64
 const MIN_SPEED := 15.0
 const MAX_SPEED := 35.0
+const MIN_Y_SPEED := 8.0
+const MAX_Y_SPEED := 20.0
 
 func _ready() -> void:
 	clip_contents = true
@@ -43,11 +45,14 @@ func _process(delta: float) -> void:
 
 	var to_remove: Array[Label] = []
 	for label in _texts:
-		label.position.x += label.get_meta("speed") * delta
+		label.position.x += label.get_meta("speed_x") * delta
+		label.position.y += label.get_meta("speed_y") * delta
 		var dir: int = label.get_meta("dir")
 		if dir > 0 and label.position.x > size.x:
 			to_remove.append(label)
 		elif dir < 0 and label.position.x < -label.size.x:
+			to_remove.append(label)
+		elif label.position.y > size.y or label.position.y < -label.size.y:
 			to_remove.append(label)
 
 	for label in to_remove:
@@ -64,14 +69,19 @@ func _spawn_text(initial: bool) -> void:
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", _get_text_color())
 
-	# Random direction: left-to-right or right-to-left
+	# Random horizontal direction: left-to-right or right-to-left
 	var dir := 1 if randf() > 0.5 else -1
-	var speed := randf_range(MIN_SPEED, MAX_SPEED) * dir
-	label.set_meta("speed", speed)
+	var speed_x := randf_range(MIN_SPEED, MAX_SPEED) * dir
+	# Random vertical drift (up or down)
+	var y_dir := 1 if randf() > 0.5 else -1
+	var speed_y := randf_range(MIN_Y_SPEED, MAX_Y_SPEED) * y_dir
+	label.set_meta("speed_x", speed_x)
+	label.set_meta("speed_y", speed_y)
 	label.set_meta("dir", dir)
 
-	# Slight rotation for visual variety
-	label.rotation = randf_range(-0.08, 0.08)
+	# Diagonal rotation matching movement direction
+	var angle := atan2(speed_y, speed_x)
+	label.rotation = angle * 0.3 + randf_range(-0.05, 0.05)
 
 	var y := randf_range(-20, size.y - font_size + 20)
 	label.position.y = y
