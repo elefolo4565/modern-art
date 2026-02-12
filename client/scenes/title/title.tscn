@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://title001"]
+[gd_scene load_steps=5 format=3 uid="uid://title001"]
 
 [ext_resource type="Script" path="res://scripts/title/title.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/components/bg_text_flow.gd" id="bg_text_flow"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font_size = 56
@@ -25,6 +26,14 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.95, 0.93, 0.88, 1)
+
+[node name="TextFlow" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("bg_text_flow")
 
 [node name="VBox" type="VBoxContainer" parent="."]
 layout_mode = 1

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://result001"]
+[gd_scene load_steps=3 format=3 uid="uid://result001"]
 
 [ext_resource type="Script" path="res://scripts/game/result.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/components/bg_text_flow.gd" id="bg_text_flow"]
 
 [node name="Result" type="Control"]
 layout_mode = 3
@@ -17,6 +18,14 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.95, 0.93, 0.88, 1)
+
+[node name="TextFlow" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("bg_text_flow")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1

@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://game001"]
+[gd_scene load_steps=7 format=3 uid="uid://game001"]
 
 [ext_resource type="Script" path="res://scripts/game/game_board.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/components/bg_text_flow.gd" id="bg_text_flow"]
 [ext_resource type="PackedScene" uid="uid://hand001" path="res://scenes/components/hand_area.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://market001" path="res://scenes/game/market_board.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://auction001" path="res://scenes/game/auction_panel.tscn" id="4"]
@@ -21,6 +22,14 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.95, 0.93, 0.88, 1)
+
+[node name="TextFlow" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("bg_text_flow")
 
 [node name="MainVBox" type="VBoxContainer" parent="."]
 layout_mode = 1
