@@ -17,6 +17,7 @@ signal go_to_game
 @onready var hard_btn: Button = $MarginContainer/VBox/DifficultyRow/HardBtn
 @onready var start_button: Button = $MarginContainer/VBox/StartButton
 @onready var back_button: Button = $MarginContainer/VBox/BackButton
+@onready var bg_rect: ColorRect = $BG
 
 var _ai_difficulty: String = "normal"
 
@@ -34,6 +35,8 @@ func _ready() -> void:
 	GameState.game_started.connect(_on_game_started)
 	GameState.error_received.connect(_on_error)
 	Locale.language_changed.connect(_update_texts)
+	Settings.bg_color_changed.connect(func(): bg_rect.color = Settings.get_bg_color())
+	bg_rect.color = Settings.get_bg_color()
 
 	_update_texts()
 	_update_player_list()

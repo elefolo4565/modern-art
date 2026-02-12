@@ -7,6 +7,7 @@ const LOBBY_SCENE := "res://scenes/lobby/lobby.tscn"
 const WAITING_SCENE := "res://scenes/lobby/waiting_room.tscn"
 const GAME_SCENE := "res://scenes/game/game_board.tscn"
 const RESULT_SCENE := "res://scenes/game/result.tscn"
+const SETTINGS_SCENE := "res://scenes/settings/settings.tscn"
 
 var _current_scene: Control = null
 
@@ -34,6 +35,8 @@ func _change_scene(scene_path: String) -> void:
 			_current_scene.connect("go_to_game", _on_go_to_game)
 		if _current_scene.has_signal("go_to_result"):
 			_current_scene.connect("go_to_result", _on_go_to_result)
+		if _current_scene.has_signal("go_to_settings"):
+			_current_scene.connect("go_to_settings", _on_go_to_settings)
 
 func _on_go_to_title() -> void:
 	_change_scene(TITLE_SCENE)
@@ -49,3 +52,6 @@ func _on_go_to_game() -> void:
 
 func _on_go_to_result() -> void:
 	_change_scene(RESULT_SCENE)
+
+func _on_go_to_settings() -> void:
+	_change_scene(SETTINGS_SCENE)

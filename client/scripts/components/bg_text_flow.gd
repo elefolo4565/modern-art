@@ -9,7 +9,7 @@ var _texts: Array[Label] = []
 
 const SPAWN_INTERVAL := 1.8
 const TEXT := "modern art"
-const COLOR := Color(0.88, 0.85, 0.78, 0.13)
+const FALLBACK_COLOR := Color(0.88, 0.85, 0.78, 0.13)
 const MIN_SIZE := 28
 const MAX_SIZE := 64
 const MIN_SPEED := 15.0
@@ -19,9 +19,21 @@ func _ready() -> void:
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_font = preload("res://assets/fonts/DelaGothicOne-Regular.ttf")
+	if Settings:
+		Settings.bg_color_changed.connect(_on_bg_color_changed)
 	# Seed some initial texts so screen isn't empty at start
 	for i in range(6):
 		_spawn_text(true)
+
+func _get_text_color() -> Color:
+	if Settings:
+		return Settings.get_flow_text_color()
+	return FALLBACK_COLOR
+
+func _on_bg_color_changed() -> void:
+	var c := _get_text_color()
+	for label in _texts:
+		label.add_theme_color_override("font_color", c)
 
 func _process(delta: float) -> void:
 	_spawn_timer += delta
@@ -50,7 +62,7 @@ func _spawn_text(initial: bool) -> void:
 
 	var font_size := randi_range(MIN_SIZE, MAX_SIZE)
 	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", COLOR)
+	label.add_theme_color_override("font_color", _get_text_color())
 
 	# Random direction: left-to-right or right-to-left
 	var dir := 1 if randf() > 0.5 else -1

@@ -73,11 +73,11 @@ custom_minimum_size = Vector2(0, 70)
 theme_override_font_sizes/font_size = 28
 text = "PLAY"
 
-[node name="LangButton" type="Button" parent="VBox"]
+[node name="SettingsButton" type="Button" parent="VBox"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 55)
 theme_override_font_sizes/font_size = 20
-text = "Language / 言語"
+text = "Settings"
 
 [node name="ConnectionLabel" type="Label" parent="."]
 layout_mode = 1

@@ -15,6 +15,7 @@ signal go_to_waiting
 @onready var no_rooms_label: Label = $MarginContainer/VBox/RoomListScroll/RoomList/NoRoomsLabel
 @onready var back_button: Button = $MarginContainer/VBox/BackButton
 @onready var error_label: Label = $MarginContainer/VBox/ErrorLabel
+@onready var bg_rect: ColorRect = $BG
 
 const SAVE_PATH := "user://settings.cfg"
 
@@ -32,6 +33,8 @@ func _ready() -> void:
 	Network.connected.connect(_on_connected)
 	Network.disconnected.connect(_on_disconnected)
 	Locale.language_changed.connect(_update_texts)
+	Settings.bg_color_changed.connect(func(): bg_rect.color = Settings.get_bg_color())
+	bg_rect.color = Settings.get_bg_color()
 
 	# Restore player name: from GameState (same session) or saved file
 	if GameState.player_name != "":

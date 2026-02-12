@@ -28,6 +28,9 @@ func _load_translations() -> void:
 		"title_play": {"ja": "プレイ", "en": "Play"},
 		"title_settings": {"ja": "設定", "en": "Settings"},
 		"title_language": {"ja": "Language / 言語", "en": "Language / 言語"},
+		"settings_title": {"ja": "設定", "en": "Settings"},
+		"settings_language": {"ja": "言語", "en": "Language"},
+		"settings_bg_color": {"ja": "背景色", "en": "Background"},
 
 		# Lobby
 		"lobby_title": {"ja": "ロビー", "en": "Lobby"},

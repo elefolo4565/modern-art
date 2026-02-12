@@ -11,10 +11,13 @@ signal go_to_title
 @onready var market_label: Label = $MarginContainer/VBox/MarketLabel
 @onready var market_results: VBoxContainer = $MarginContainer/VBox/MarketResults
 @onready var back_button: Button = $MarginContainer/VBox/BackButton
+@onready var bg_rect: ColorRect = $BG
 
 func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	Locale.language_changed.connect(_update_texts)
+	Settings.bg_color_changed.connect(func(): bg_rect.color = Settings.get_bg_color())
+	bg_rect.color = Settings.get_bg_color()
 	_display_results()
 
 func _display_results() -> void:

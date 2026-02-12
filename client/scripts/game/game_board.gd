@@ -33,6 +33,8 @@ signal go_to_title
 @onready var paintings_content: VBoxContainer = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsScroll/PaintingsContent
 @onready var paintings_close_button: Button = $PaintingsOverlay/PaintingsMargin/PaintingsVBox/PaintingsTitleBar/PaintingsCloseButton
 
+@onready var bg_rect: ColorRect = $BG
+
 const PLAYER_INFO_SCENE := preload("res://scenes/components/player_info.tscn")
 const AUCTION_ICONS := {"open": ">>", "once_around": "->", "sealed": "[]", "fixed_price": "$=", "double": "x2"}
 
@@ -65,6 +67,8 @@ func _ready() -> void:
 	GameState.hand_updated.connect(_update_hand_state)
 	GameState.state_changed.connect(_refresh_all)
 	Locale.language_changed.connect(_update_texts)
+	Settings.bg_color_changed.connect(func(): bg_rect.color = Settings.get_bg_color())
+	bg_rect.color = Settings.get_bg_color()
 
 	# Initialize if game already started (scene reload)
 	if GameState.players.size() > 0:
