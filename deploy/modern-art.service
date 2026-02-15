@@ -1,0 +1,19 @@
+[Unit]
+Description=Modern Art WebSocket Game Server
+After=network.target
+
+[Service]
+Type=simple
+User=modern-art
+Group=modern-art
+WorkingDirectory=/opt/modern-art/server
+ExecStart=/opt/modern-art/venv/bin/python main.py --port 8080 --no-static
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=modern-art
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -7,7 +7,7 @@
 - ユーザーに選択肢を提示する場合（AskUserQuestion等）、選択肢のラベルと説明を日本語で記述すること
 
 ## バージョン
-0.17
+0.18
 
 ## プロジェクト概要
 ライナー・クニツィアのカードゲーム「モダンアート」のオンライン対戦ゲーム。
@@ -18,7 +18,7 @@
 - **サーバー**: Python 3 + aiohttp (WebSocket)
 - **通信**: WebSocket (JSON)
 - **対応言語**: 日本語・英語（切替可能）
-- **ホスティング**: クライアント=GitHub Pages / サーバー=Render
+- **ホスティング**: VPS (Rocky Linux) - Nginx + systemd
 
 ## フォルダ構成
 ```
@@ -39,6 +39,11 @@ server/          Pythonサーバー
 ├── cards.py         カード定義・デッキ・配布
 ├── ai_player.py     AI対戦（AIBrain + AIPlayerController）
 └── protocol.py      メッセージプロトコル
+deploy/          VPSデプロイ設定
+├── modern-art.service  systemdサービス定義
+├── nginx-modern-art.conf  Nginx設定
+├── setup-vps.sh     初期セットアップスクリプト
+└── update.sh        日常更新スクリプト
 export/          Godot Web Export 出力先
 ```
 
@@ -75,17 +80,47 @@ cd server && python main.py --port 8080
 - **ダブルカード手札フィルタ**: ダブル選択時、同じアーティストのカードのみ選択可能。hand_area.set_filter()/clear_filter()で制御
 
 ## デプロイ構成
-- **クライアント**: GitHub Pages（`.github/workflows/deploy-pages.yml` で `export/` を自動デプロイ）
-- **サーバー**: Render（`server/render.yaml` で Python WebSocket サーバーをデプロイ）
-- **WebSocket接続**: `network.gd` の `server_url` に Render の URL をハードコード。ローカル開発時は自動的に `ws://127.0.0.1:8080/ws` に切替
+- **ホスティング先**: VPS (Rocky Linux) - クライアント・サーバー両方
+- **Webサーバー**: Nginx (SSL/HTTPS + 静的ファイル配信 + WebSocket リバースプロキシ)
+- **アプリサーバー**: systemd で管理 (`modern-art.service`)
+- **SSL**: Let's Encrypt (certbot) で自動更新
+- **自動デプロイ**: `.github/workflows/deploy-vps.yml` で main ブランチへの push 時に SSH 経由でVPSを更新
+- **ゲームURL**: `https://elefolo2.com/games/modern-art`
+- **WebSocket接続**: `network.gd` の `server_url` に `wss://elefolo2.com/games/modern-art/ws` をハードコード。ローカル開発時は自動的に `ws://127.0.0.1:8080/ws` に切替
 - **フォント**: NotoSansJP-Bold.ttf をデフォルトテーマに設定（Web Export で日本語表示に必須）
+
+### VPS ディレクトリ構成
+```
+/opt/modern-art/
+├── repo/          git リポジトリ (ソース管理)
+├── server/        実行用サーバーファイル (repo/server/ のコピー)
+├── export/        実行用静的ファイル (repo/export/ のコピー)
+└── venv/          Python 仮想環境
+```
+
+### VPS 管理コマンド
+```bash
+# サーバー状態確認
+systemctl status modern-art
+# サーバーログ
+journalctl -u modern-art -f
+# 手動更新
+bash /opt/modern-art/repo/deploy/update.sh
+# Nginx 設定テスト
+nginx -t
+```
+
+### GitHub Actions Secrets（自動デプロイに必要）
+- `VPS_HOST`: VPS の IP アドレスまたはドメイン名
+- `VPS_USER`: SSH ユーザー名
+- `VPS_SSH_KEY`: SSH 秘密鍵
 
 ## バージョン管理ルール
 - 機能追加・バグ修正・UIの変更など、何らかの更新を行った場合は CLAUDE.md のバージョン番号をインクリメントする（パッチ: +0.1）
 - クライアント変更を含む場合は `game_state.gd` の `BUILD_DATE` を日本時刻（JST）の `yyyymmdd_hhmmss` 形式で更新する
 - クライアント変更を含む場合は `export/` を再エクスポートしてコミットに含めること
-- クライアント変更時: Godot で Web Export を再実行 → `export/` をコミット → プッシュで GitHub Pages が自動更新
-- サーバー変更時: コミット＆プッシュで Render が自動デプロイ。ローカルサーバーも再起動する
+- クライアント変更時: Godot で Web Export を再実行 → `export/` をコミット → プッシュで GitHub Actions が VPS に自動デプロイ
+- サーバー変更時: コミット＆プッシュで GitHub Actions が VPS に自動デプロイ。ローカルサーバーも再起動する
 
 ## Git運用
 - 機能実装やバグ修正のたびにgitコミットを行う

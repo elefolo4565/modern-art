@@ -124,11 +124,15 @@ def main():
                         help="Port to listen on")
     parser.add_argument("--static", default=None,
                         help="Path to static files (Godot web export directory)")
+    parser.add_argument("--no-static", action="store_true",
+                        help="Disable static file serving (when behind Nginx)")
     args = parser.parse_args()
 
     # Default static dir: ../export
     static_dir = args.static
-    if static_dir is None:
+    if args.no_static:
+        static_dir = None
+    elif static_dir is None:
         default_export = os.path.join(os.path.dirname(__file__), "..", "export")
         if os.path.isdir(default_export):
             static_dir = os.path.abspath(default_export)

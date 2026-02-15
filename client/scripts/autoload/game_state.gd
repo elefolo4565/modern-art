@@ -2,8 +2,8 @@ extends Node
 
 ## Client-side game state, updated by server messages.
 
-const VERSION: String = "0.17"
-const BUILD_DATE: String = "20260213_033939"
+const VERSION: String = "0.18"
+const BUILD_DATE: String = "20260215_120000"
 
 signal state_changed
 signal hand_updated

@@ -7,9 +7,9 @@ signal disconnected
 signal message_received(data: Dictionary)
 signal connection_error(reason: String)
 
-# 本番: Render のサーバーURL（デプロイ後に更新する）
+# 本番: VPS のサーバーURL
 # ローカル開発: ws://127.0.0.1:8080/ws
-@export var server_url: String = "wss://modern-art.onrender.com/ws"
+@export var server_url: String = "wss://elefolo2.com/games/modern-art/ws"
 
 var _socket: WebSocketPeer = WebSocketPeer.new()
 var _connected: bool = false
